@@ -19,7 +19,9 @@
     "muscleGroup": "Група м'язів",
     "description": "Опис",
     "activate": "Активувати",
-    "deactivate": "Деактивувати"
+    "deactivate": "Деактивувати",
+    "allCategories": "Усі категорії",
+    "allMuscleGroups": "Усі групи м'язів"
   },
   "overview": {
     "activeClients": "Активні клієнти",

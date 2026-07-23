@@ -19,7 +19,9 @@
     "muscleGroup": "Група м'язів",
     "description": "Опис",
     "activate": "Активувати",
-    "deactivate": "Деактивувати"
+    "deactivate": "Деактивувати",
+    "allCategories": "Усі категорії",
+    "allMuscleGroups": "Усі групи м'язів"
   },
   "overview": {
     "activeClients": "Активні клієнти",
@@ -75,11 +77,7 @@
     "noReviews": "Відгуків не знайдено",
     "noReviewsDesc": "Відгуки від клієнтів з'являться тут.",
     "visible": "Видимий",
-    "hidden": "Прихований",
-    "hideReasonPrompt": "Введіть причину приховання цього відгуку (необов'язково):",
-    "hideModalTitle": "Приховати відгук",
-    "hideModalDescription": "Цей відгук буде приховано з публічного перегляду. Ви можете необов'язково вказати причину.",
-    "hideButton": "Приховати"
+    "hidden": "Прихований"
   },
   "broadcast": {
     "title": "Сповіщення для всіх",

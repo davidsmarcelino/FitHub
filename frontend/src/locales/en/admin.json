@@ -19,7 +19,9 @@
     "muscleGroup": "Muscle Group",
     "description": "Description",
     "activate": "Activate",
-    "deactivate": "Deactivate"
+    "deactivate": "Deactivate",
+    "allCategories": "All Categories",
+    "allMuscleGroups": "All Muscle Groups"
   },
   "overview": {
     "activeClients": "Active clients",

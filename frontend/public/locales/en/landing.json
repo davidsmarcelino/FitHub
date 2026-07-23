@@ -27,6 +27,22 @@
       "label": "Goal achievement"
     }
   },
+  "howItWorks": {
+    "title": "How it works",
+    "subtitle": "Get started in three simple steps",
+    "step1": {
+      "title": "Create your profile",
+      "description": "Sign up and set your fitness goals, experience level, and preferences."
+    },
+    "step2": {
+      "title": "Track your workouts",
+      "description": "Log exercises, sets, and reps. Follow personalized training plans."
+    },
+    "step3": {
+      "title": "See your progress",
+      "description": "Visualize your improvements with detailed analytics and charts."
+    }
+  },
   "features": {
     "title": "Everything you need to succeed",
     "subtitle": "Powerful features designed to help you track, analyze, and optimize your fitness journey.",
@@ -54,6 +70,11 @@
       "title": "Community Support",
       "description": "Connect with like-minded fitness enthusiasts. Share your progress, get inspired, and stay accountable together."
     }
+  },
+  "socialProof": {
+    "workoutsLogged": "Workouts logged by our community",
+    "activeMembers": "Active members worldwide",
+    "averageRating": "Average user rating"
   },
   "cta": {
     "title": "Ready to start your fitness journey?",

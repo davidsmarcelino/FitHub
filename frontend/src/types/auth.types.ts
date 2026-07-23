@@ -1,5 +1,3 @@
-import type { MessageResponse } from './common.types'
-
 export interface LoginRequest {
   email: string
   password: string
@@ -38,5 +36,3 @@ export interface ResendVerificationRequest {
 export interface ForgotPasswordRequest {
   email: string
 }
-
-export type { MessageResponse }

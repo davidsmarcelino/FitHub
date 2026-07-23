@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Dumbbell, Plus, Search, X } from 'lucide-react'
@@ -9,6 +9,8 @@ import { EmptyState } from '../components/ui/empty-state'
 import { Pagination } from '../components/ui/pagination'
 import {
   getExercises,
+  getExercisesByCategory,
+  getExercisesByMuscleGroup,
   createExercise,
   updateExercise,
   activateExercise,
@@ -36,15 +38,24 @@ const ExerciseManagement = () => {
   const [exercises, setExercises] = useState<ExerciseResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [filterCategory, setFilterCategory] = useState<ExerciseCategory | ''>('')
+  const [filterMuscleGroup, setFilterMuscleGroup] = useState<MuscleGroup | ''>('')
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(1)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [editingExercise, setEditingExercise] = useState<ExerciseResponse | null>(null)
 
-  const loadExercises = async (page = 0, searchQuery?: string) => {
+  const loadExercises = useCallback(async (page = 0, searchQuery?: string, category?: ExerciseCategory, muscleGroup?: MuscleGroup) => {
     setIsLoading(true)
     try {
-      const result = await getExercises(searchQuery ? 0 : page, searchQuery ? 100 : 12)
+      let result
+      if (category) {
+        result = await getExercisesByCategory(category, 0, 100)
+      } else if (muscleGroup) {
+        result = await getExercisesByMuscleGroup(muscleGroup, 0, 100)
+      } else {
+        result = await getExercises(searchQuery ? 0 : page, searchQuery ? 100 : 12)
+      }
       let filtered = result.content
       if (searchQuery) {
         filtered = filtered.filter(
@@ -54,21 +65,27 @@ const ExerciseManagement = () => {
         )
       }
       setExercises(filtered)
-      setTotalPages(searchQuery ? 1 : result.totalPages)
+      setTotalPages(searchQuery || category || muscleGroup ? 1 : result.totalPages)
       setCurrentPage(page)
     } catch {
       toast.error(t('common:errors.loadFailed'))
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [t])
 
   useEffect(() => {
     void loadExercises()
-  }, [])
+  }, [loadExercises])
 
   const handleSearch = () => {
-    void loadExercises(0, search.trim() || undefined)
+    void loadExercises(0, search.trim() || undefined, filterCategory || undefined, filterMuscleGroup || undefined)
+  }
+
+  const handleFilterChange = (category: ExerciseCategory | '', muscleGroup: MuscleGroup | '') => {
+    setFilterCategory(category)
+    setFilterMuscleGroup(muscleGroup)
+    void loadExercises(0, search.trim() || undefined, category || undefined, muscleGroup || undefined)
   }
 
   const handleToggleActive = async (exercise: ExerciseResponse) => {
@@ -80,7 +97,7 @@ const ExerciseManagement = () => {
         await activateExercise(exercise.id)
         toast.success(t('common:messages.updated'))
       }
-      await loadExercises(currentPage, search.trim() || undefined)
+      await loadExercises(currentPage, search.trim() || undefined, filterCategory || undefined, filterMuscleGroup || undefined)
     } catch (err) {
       toast.error(getApiErrorMessage(err))
     }
@@ -88,24 +105,51 @@ const ExerciseManagement = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">{t('exercises.title')}</h1>
-          <p className="text-sm text-muted-foreground">{t('exercises.subtitle')}</p>
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <h1 className="text-2xl font-bold md:text-3xl">{t('exercises.title')}</h1>
+            <p className="mt-1 text-emerald-100">{t('exercises.subtitle')}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsCreateModalOpen(true)}
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-white/20 px-4 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/30"
+          >
+            <Plus className="h-4 w-4" />
+            {t('exercises.create')}
+          </button>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('exercises.create')}
-        </Button>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <Input
           placeholder={t('common:labels.search')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+          className="flex-1"
         />
+        <select
+          value={filterCategory}
+          onChange={(e) => handleFilterChange(e.target.value as ExerciseCategory | '', filterMuscleGroup)}
+          className="h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground"
+        >
+          <option value="">{t('exercises.allCategories')}</option>
+          {exerciseCategories.map((c) => (
+            <option key={c} value={c}>{t(`common:enums.exerciseCategory.${c}`)}</option>
+          ))}
+        </select>
+        <select
+          value={filterMuscleGroup}
+          onChange={(e) => handleFilterChange(filterCategory, e.target.value as MuscleGroup | '')}
+          className="h-10 rounded-xl border border-border bg-background px-3 text-sm text-foreground"
+        >
+          <option value="">{t('exercises.allMuscleGroups')}</option>
+          {muscleGroups.map((m) => (
+            <option key={m} value={m}>{t(`common:enums.muscleGroup.${m}`)}</option>
+          ))}
+        </select>
         <Button variant="outline" onClick={handleSearch}>
           <Search className="h-4 w-4" />
         </Button>
@@ -140,8 +184,8 @@ const ExerciseManagement = () => {
                   <span
                     className={`rounded-full px-2 py-1 text-xs font-medium ${
                       exercise.active
-                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                        : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
                     }`}
                   >
                     {exercise.active ? t('common:status.active') : t('common:status.inactive')}

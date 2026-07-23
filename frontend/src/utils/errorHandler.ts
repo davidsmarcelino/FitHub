@@ -17,6 +17,7 @@ const getAuthMessageByStatus = (status: number): string | null => {
     409: i18n.t('common:errors.conflict'),
     422: i18n.t('common:errors.validationError'),
     429: i18n.t('common:errors.rateLimitError'),
+    500: i18n.t('common:errors.error'),
   }
   return messages[status] ?? null
 }

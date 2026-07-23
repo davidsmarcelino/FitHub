@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import {
@@ -35,7 +35,7 @@ const Notifications = () => {
   const eventSourceRef = useRef<EventSource | null>(null)
   const mounted = useMountedRef()
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true)
     try {
       const [notiPage, summaryData] = await Promise.allSettled([
@@ -51,11 +51,11 @@ const Notifications = () => {
     } finally {
       if (mounted.current) setIsLoading(false)
     }
-  }
+  }, [mounted])
 
   useEffect(() => {
     void loadData()
-  }, [])
+  }, [loadData])
 
   useEffect(() => {
     const token = localStorage.getItem('access_token')
@@ -92,7 +92,7 @@ const Notifications = () => {
       clearTimeout(reconnectTimeout)
       eventSourceRef.current?.close()
     }
-  }, [])
+  }, [loadData])
 
   const handleMarkAllRead = async () => {
     try {
@@ -123,30 +123,27 @@ const Notifications = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('badge')}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            {t('title')}
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            {unreadCount > 0
-              ? t('unreadCount', { count: unreadCount })
-              : t('allCaughtUp')}
-          </p>
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <h1 className="text-2xl font-bold md:text-3xl">{t('title')}</h1>
+            <p className="mt-1 text-emerald-100">
+              {unreadCount > 0
+                ? t('unreadCount', { count: unreadCount })
+                : t('allCaughtUp')}
+            </p>
+          </div>
+          {unreadCount > 0 && (
+            <button
+              type="button"
+              onClick={() => void handleMarkAllRead()}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-white/20 px-4 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/30"
+            >
+              <CheckCheck className="h-4 w-4" />
+              {t('markAllRead')}
+            </button>
+          )}
         </div>
-        {unreadCount > 0 && (
-          <button
-            type="button"
-            onClick={() => void handleMarkAllRead()}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground transition-all hover:bg-accent"
-          >
-            <CheckCheck className="h-4 w-4" />
-            {t('markAllRead')}
-          </button>
-        )}
       </div>
 
       {isLoading ? (
@@ -206,9 +203,9 @@ const notificationIcons: Record<string, typeof Bell> = {
 const priorityColors: Record<string, string> = {
   LOW: 'bg-muted text-muted-foreground',
   NORMAL: 'bg-primary/10 text-primary',
-  MEDIUM: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  HIGH: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  URGENT: 'bg-red-500/10 text-red-600 dark:text-red-400',
+  MEDIUM: 'bg-blue-500/10 text-blue-600',
+  HIGH: 'bg-amber-500/10 text-amber-600',
+  URGENT: 'bg-red-500/10 text-red-600',
 }
 
 const NotificationRow = ({

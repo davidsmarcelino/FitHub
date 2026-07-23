@@ -16,7 +16,8 @@
       "admin": "Admin",
       "myPlans": "My Plans",
       "trainerSessions": "My Sessions",
-      "exerciseManagement": "Exercises"
+      "exerciseManagement": "Exercises",
+      "foodManagement": "Foods"
     },
     "trainingLoad": {
       "label": "Training Load",

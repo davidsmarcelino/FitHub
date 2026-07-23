@@ -131,7 +131,7 @@ export const LogWorkoutModal = ({
                 aria-label={t('common:buttons.close')}
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition hover:bg-emerald-50 hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -256,7 +256,7 @@ export const LogWorkoutModal = ({
                   <Button
                     type="submit"
                     size="sm"
-                    className="rounded-xl px-4"
+                    className="rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110 px-4"
                     disabled={isSubmitting}
                   >
                     {isSubmitting && (

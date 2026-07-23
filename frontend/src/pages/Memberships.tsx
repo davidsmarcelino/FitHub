@@ -63,7 +63,7 @@ const Memberships = () => {
       }
     }
     void load()
-  }, [])
+  }, [mounted])
 
   const [now, setNow] = useState(() => Date.now())
 
@@ -81,18 +81,9 @@ const Memberships = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('badge')}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            {t('title')}
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            {t('subtitle')}
-          </p>
-        </div>
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <h1 className="text-2xl font-bold md:text-3xl">{t('title')}</h1>
+        <p className="mt-1 text-emerald-100">{t('subtitle')}</p>
       </div>
 
       {isLoading ? (

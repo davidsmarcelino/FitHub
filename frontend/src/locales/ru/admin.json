@@ -19,7 +19,9 @@
     "muscleGroup": "Группа мышц",
     "description": "Описание",
     "activate": "Активировать",
-    "deactivate": "Деактивировать"
+    "deactivate": "Деактивировать",
+    "allCategories": "Все категории",
+    "allMuscleGroups": "Все группы мышц"
   },
   "overview": {
     "activeClients": "Активные клиенты",

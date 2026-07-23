@@ -7,15 +7,15 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 const baseStyles =
-  'inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+  'inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
 
 const variantStyles: Record<NonNullable<ButtonProps['variant']>, string> = {
   default:
-    'bg-primary text-primary-foreground shadow-soft hover:bg-primary/90 dark:bg-gradient-to-r dark:from-emerald-400 dark:via-cyan-400 dark:to-sky-500 dark:text-slate-950',
+    'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-soft hover:shadow-soft-md hover:from-emerald-600 hover:to-emerald-700',
   outline:
-    'border border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground',
-  ghost: 'text-foreground hover:bg-accent hover:text-accent-foreground',
-  secondary: 'bg-muted text-muted-foreground hover:bg-muted/80',
+    'border border-border bg-white text-foreground hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200',
+  ghost: 'text-foreground hover:bg-emerald-50 hover:text-emerald-700',
+  secondary: 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100',
 }
 
 const sizeStyles: Record<NonNullable<ButtonProps['size']>, string> = {
@@ -43,4 +43,3 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 )
 
 Button.displayName = 'Button'
-

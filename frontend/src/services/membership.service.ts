@@ -1,5 +1,5 @@
-import axios from 'axios'
 import api from './api'
+import { handleNotFound } from './api-helpers'
 import type { PageResponse } from '../types/common.types'
 import type {
   CreateMembershipRequest,
@@ -16,18 +16,10 @@ export type {
 } from '../types/membership.types'
 
 export const getMyActiveMembership =
-  async (): Promise<MembershipResponse | null> => {
-    try {
-      const { data } = await api.get<MembershipResponse>('/memberships/me/active')
-      return data
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        return null
-      }
-
-      throw error
-    }
-  }
+  async (): Promise<MembershipResponse | null> =>
+    handleNotFound(() =>
+      api.get<MembershipResponse>('/memberships/me/active').then((r) => r.data),
+    )
 
 export const getMyMembershipHistory =
   async (): Promise<MembershipHistoryResponse> => {

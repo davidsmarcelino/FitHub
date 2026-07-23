@@ -19,7 +19,9 @@
     "muscleGroup": "Muscle Group",
     "description": "Description",
     "activate": "Activate",
-    "deactivate": "Deactivate"
+    "deactivate": "Deactivate",
+    "allCategories": "All Categories",
+    "allMuscleGroups": "All Muscle Groups"
   },
   "overview": {
     "activeClients": "Active clients",
@@ -46,7 +48,6 @@
       "cancel": "Cancel",
       "extend": "Extend"
     },
-    "cancelConfirm": "Are you sure you want to cancel this membership? This action cannot be undone.",
     "visitsLeft": "{{count}} visits left",
     "unlimited": "Unlimited visits",
     "createModal": {
@@ -76,11 +77,7 @@
     "noReviews": "No reviews found",
     "noReviewsDesc": "Reviews from clients will appear here.",
     "visible": "Visible",
-    "hidden": "Hidden",
-    "hideReasonPrompt": "Enter a reason for hiding this review (optional):",
-    "hideModalTitle": "Hide Review",
-    "hideModalDescription": "This review will be hidden from public view. You can optionally provide a reason.",
-    "hideButton": "Hide Review"
+    "hidden": "Hidden"
   },
   "broadcast": {
     "title": "Broadcast notification",

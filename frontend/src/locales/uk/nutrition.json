@@ -5,19 +5,19 @@
   "editTargets": "Редагувати цілі",
   "water": {
     "today": "Вода сьогодні",
-    "ofTarget": "з {{target}} ml мети",
-    "mlLogged": "{{total}} / {{target}} ml",
+    "ofTarget": "з {{target}} мл мети",
+    "mlLogged": "{{total}} / {{target}} мл",
     "logged": "зареєстровано сьогодні",
-    "loggedAmount": "{{amount}} ml зареєстровано.",
+    "loggedAmount": "{{amount}} мл зареєстровано.",
     "noIntakes": "Сьогодні не зареєстровано жодного прийому води. Почніть з малого.",
     "quickAdd": "Швидке додавання",
-    "customAmount": "Кількість у ml",
+    "customAmount": "Кількість у мл",
     "logWater": "Зареєструвати воду",
     "weekly": "Тижнева гідратація",
     "weeklyDesc": "Прогрес споживання води за сім днів.",
     "noWeekly": "Немає щотижневої історії води",
     "noWeeklyDesc": "Ваш тижневий графік гідратації з'явиться, коли ви почнете реєструвати воду.",
-    "quickAddAmount": "+{{amount}} ml"
+    "quickAddAmount": "+{{amount}} мл"
   },
   "calories": {
     "today": "Калорії сьогодні",
@@ -78,7 +78,30 @@
     "POST_WORKOUT": "Після тренування"
   },
   "food": {
-    "searchPlaceholder": "Пошук продуктів..."
+    "searchPlaceholder": "Пошук продуктів...",
+    "management": "Каталог продуктів",
+    "managementDescription": "Створюйте, редагуйте та керуйте продуктами харчування",
+    "add": "Додати продукт",
+    "addTitle": "Новий продукт",
+    "edit": "Редагувати",
+    "editTitle": "Редагувати продукт",
+    "created": "Продукт успішно створено",
+    "updated": "Продукт успішно оновлено",
+    "deactivated": "Продукт деактивовано",
+    "noFoods": "Продукти не знайдено",
+    "noFoodsDescription": "Створіть перший продукт для початку роботи",
+    "name": "Назва",
+    "brand": "Бренд",
+    "servingSize": "Розмір порції",
+    "servingUnit": "Одиниця",
+    "calories": "Калорії на порцію",
+    "caloriesPerServing": "ккал/порція",
+    "protein": "Білок",
+    "carbs": "Вуглеводи",
+    "fats": "Жири",
+    "fiber": "Клітковина",
+    "sugar": "Цукор",
+    "barcode": "Штрих-код"
   },
   "errors": {
     "loadFailed": "Деякі секції харчування не вдалося оновити. Доступні секції все ще відображаються."

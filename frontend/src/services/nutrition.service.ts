@@ -1,7 +1,8 @@
-import axios from 'axios'
 import api from './api'
+import { handleNotFound } from './api-helpers'
 import type { MessageResponse, PageResponse } from '../types/common.types'
 import type {
+  CreateFoodRequest,
   CreateMealPlanRequest,
   CreateMealRequest,
   DailyWaterIntakeResponse,
@@ -9,6 +10,7 @@ import type {
   LogWaterIntakeRequest,
   MealPlanResponse,
   MealResponse,
+  UpdateFoodRequest,
   UpdateMealPlanRequest,
   WaterIntakeResponse,
 } from '../types/nutrition.types'
@@ -26,37 +28,17 @@ export type {
 } from '../types/nutrition.types'
 
 export const getTodayWaterIntake =
-  async (): Promise<DailyWaterIntakeResponse | null> => {
-    try {
-      const { data } = await api.get<DailyWaterIntakeResponse>(
-        '/nutrition/water-intake/today',
-      )
-      return data
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        return null
-      }
-
-      throw error
-    }
-  }
+  async (): Promise<DailyWaterIntakeResponse | null> =>
+    handleNotFound(() =>
+      api.get<DailyWaterIntakeResponse>('/nutrition/water-intake/today').then((r) => r.data),
+    )
 
 export const getTodayMealPlan = async (
   date: string,
-): Promise<MealPlanResponse | null> => {
-  try {
-    const { data } = await api.get<MealPlanResponse>(
-      `/nutrition/meal-plans/date/${date}`,
-    )
-    return data
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      return null
-    }
-
-    throw error
-  }
-}
+): Promise<MealPlanResponse | null> =>
+  handleNotFound(() =>
+    api.get<MealPlanResponse>(`/nutrition/meal-plans/date/${date}`).then((r) => r.data),
+  )
 
 export const createMealPlan = async (
   payload: CreateMealPlanRequest,
@@ -167,19 +149,10 @@ export const getFoods = async (
 
 export const getFoodByBarcode = async (
   barcode: string,
-): Promise<FoodResponse | null> => {
-  try {
-    const { data } = await api.get<FoodResponse>(
-      `/nutrition/foods/barcode/${barcode}`,
-    )
-    return data
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      return null
-    }
-    throw error
-  }
-}
+): Promise<FoodResponse | null> =>
+  handleNotFound(() =>
+    api.get<FoodResponse>(`/nutrition/foods/barcode/${barcode}`).then((r) => r.data),
+  )
 
 export const getWeeklyMealPlans = async (
   startDate: string,
@@ -197,5 +170,20 @@ export const deactivateFood = async (
   const { data } = await api.patch<MessageResponse>(
     `/nutrition/foods/${foodId}/deactivate`,
   )
+  return data
+}
+
+export const createFood = async (
+  payload: CreateFoodRequest,
+): Promise<FoodResponse> => {
+  const { data } = await api.post<FoodResponse>('/nutrition/foods', payload)
+  return data
+}
+
+export const updateFood = async (
+  foodId: string,
+  payload: UpdateFoodRequest,
+): Promise<FoodResponse> => {
+  const { data } = await api.put<FoodResponse>(`/nutrition/foods/${foodId}`, payload)
   return data
 }

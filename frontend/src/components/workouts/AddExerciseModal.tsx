@@ -81,7 +81,7 @@ export const AddExerciseModal = ({
     }))
 
     return () => { isMounted = false }
-  }, [isOpen, plan.exercises.length])
+  }, [isOpen, plan.exercises.length, t])
 
   const updateField = (field: keyof ExerciseForm, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -143,7 +143,7 @@ export const AddExerciseModal = ({
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition hover:bg-accent"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition hover:bg-emerald-50 hover:text-emerald-600"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -268,7 +268,7 @@ export const AddExerciseModal = ({
                 <Button
                   type="submit"
                   size="sm"
-                  className="rounded-xl px-4"
+                  className="rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110 px-4"
                   disabled={isSubmitting || !form.exerciseId}
                 >
                   {isSubmitting && (

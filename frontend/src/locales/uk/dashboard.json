@@ -37,8 +37,8 @@
   },
   "water": {
     "title": "Вода сьогодні",
-    "ofTarget": "з {{target}} ml мети",
-    "mlLogged": "{{total}} / {{target}} ml",
+    "ofTarget": "з {{target}} мл мети",
+    "mlLogged": "{{total}} / {{target}} мл",
     "intakesLogged": "{{count}} прийом(ів) зареєстровано сьогодні.",
     "noIntakes": "Сьогодні не зареєстровано жодного прийому води. Почніть з одного склянки.",
     "hydrationTitle": "Гідратація",
@@ -98,7 +98,7 @@
     "todayCheckIns": "Відвідування сьогодні"
   },
   "fallbacks": {
-    "there": "тут",
+    "there": "там",
     "admin": "Адміністратор"
   },
   "errors": {

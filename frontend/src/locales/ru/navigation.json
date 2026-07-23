@@ -16,7 +16,8 @@
       "admin": "Админ",
       "myPlans": "Мои планы",
       "trainerSessions": "Мои тренировки",
-      "exerciseManagement": "Упражнения"
+      "exerciseManagement": "Упражнения",
+      "foodManagement": "Продукты"
     },
     "trainingLoad": {
       "label": "Тренировочная нагрузка",

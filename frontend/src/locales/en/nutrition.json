@@ -78,7 +78,30 @@
     "POST_WORKOUT": "Post-workout"
   },
   "food": {
-    "searchPlaceholder": "Search foods..."
+    "searchPlaceholder": "Search foods...",
+    "management": "Food Catalog",
+    "managementDescription": "Create, edit, and manage nutrition food items",
+    "add": "Add Food",
+    "addTitle": "New Food",
+    "edit": "Edit",
+    "editTitle": "Edit Food",
+    "created": "Food created successfully",
+    "updated": "Food updated successfully",
+    "deactivated": "Food deactivated",
+    "noFoods": "No foods found",
+    "noFoodsDescription": "Create your first food item to get started",
+    "name": "Name",
+    "brand": "Brand",
+    "servingSize": "Serving Size",
+    "servingUnit": "Unit",
+    "calories": "Calories per serving",
+    "caloriesPerServing": "kcal/serving",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fats": "Fats",
+    "fiber": "Fiber",
+    "sugar": "Sugar",
+    "barcode": "Barcode"
   },
   "errors": {
     "loadFailed": "Some nutrition sections could not be refreshed. The available sections are still shown."

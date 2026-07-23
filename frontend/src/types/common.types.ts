@@ -14,14 +14,4 @@ export interface MessageResponse {
   timestamp: ISODateTimeString
 }
 
-export interface ValidationError {
-  field: string
-  code: string
-  message: string
-}
 
-export interface ErrorResponse {
-  message: string
-  code: string
-  validationErrors: ValidationError[]
-}

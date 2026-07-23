@@ -72,21 +72,12 @@ const Admin = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('badge')}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            {t('title')}
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            {t('subtitle')}
-          </p>
-        </div>
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <h1 className="text-2xl font-bold md:text-3xl">{t('title')}</h1>
+        <p className="mt-1 text-emerald-100">{t('subtitle')}</p>
       </div>
 
-      <div className="flex gap-1 overflow-x-auto rounded-xl border border-border bg-muted p-1" role="tablist">
+      <div className="flex gap-1 overflow-x-auto rounded-xl bg-gray-100 p-1" role="tablist">
         {getAdminTabs(t).map((tab) => (
           <button
             key={tab.key}
@@ -96,7 +87,7 @@ const Admin = () => {
             onClick={() => setActiveTab(tab.key)}
             className={`inline-flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition ${
               activeTab === tab.key
-                ? 'bg-background text-foreground shadow-soft'
+                ? 'bg-white text-emerald-700 shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -135,7 +126,7 @@ const OverviewTab = () => {
       }
     }
     void load()
-  }, [])
+  }, [mounted, t])
 
   if (isLoading) {
     return (
@@ -523,7 +514,7 @@ const ReviewsTab = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-foreground">{t('reviews.title')}</h3>
-        <div className="flex gap-1 rounded-xl border border-border bg-muted p-1">
+        <div className="flex gap-1 rounded-xl bg-gray-100 p-1">
           {filterOptions.map((option) => (
             <button
               key={option.label}
@@ -531,7 +522,7 @@ const ReviewsTab = () => {
               onClick={() => setFilterVisible(option.value)}
               className={`rounded-lg px-3 py-1 text-xs font-medium transition ${
                 filterVisible === option.value
-                  ? 'bg-background text-foreground shadow-soft'
+                  ? 'bg-white text-emerald-700 shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -761,7 +752,7 @@ const BroadcastTab = () => {
             <button
               type="submit"
               disabled={isSubmitting || !form.title.trim() || !form.message.trim()}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 disabled:opacity-60"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110 disabled:opacity-60"
             >
               {isSubmitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />}
               <Send className="h-4 w-4" />
@@ -862,7 +853,7 @@ const CreateMembershipModal = ({
             <button type="button" onClick={onClose} disabled={isSubmitting} className="inline-flex h-9 items-center justify-center rounded-xl px-4 text-sm font-medium text-foreground transition hover:bg-accent disabled:opacity-60">
               {t('common:buttons.cancel')}
             </button>
-            <button type="submit" disabled={isSubmitting || !form.clientId.trim() || (form.type === 'VISITS' && !form.visitsLimit.trim())} className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60">
+            <button type="submit" disabled={isSubmitting || !form.clientId.trim() || (form.type === 'VISITS' && !form.visitsLimit.trim())} className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110 disabled:opacity-60">
               {isSubmitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />}
               {t('memberships.createModal.createButton')}
             </button>

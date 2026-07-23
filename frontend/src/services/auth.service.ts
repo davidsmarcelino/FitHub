@@ -1,10 +1,9 @@
 import api from './api'
+import type { MessageResponse } from '../types/common.types'
 import type {
     AuthenticationResponse,
     ForgotPasswordRequest,
     LoginRequest,
-    MessageResponse,
-    RefreshTokenRequest,
     RegistrationRequest,
     ResendVerificationRequest,
     ResetPasswordRequest,
@@ -15,13 +14,12 @@ export type {
     AuthenticationResponse,
     ForgotPasswordRequest,
     LoginRequest,
-    MessageResponse,
-    RefreshTokenRequest,
     RegistrationRequest,
     ResendVerificationRequest,
     ResetPasswordRequest,
     VerifyEmailRequest,
 } from '../types/auth.types'
+export type { MessageResponse } from '../types/common.types'
 
 export const login = async (
     payload: LoginRequest,
@@ -75,16 +73,6 @@ export const resetPassword = async (
 ): Promise<MessageResponse> => {
     const {data} = await api.post<MessageResponse>(
         '/account-action/reset-password',
-        payload,
-    )
-    return data
-}
-
-export const refreshToken = async (
-    payload: RefreshTokenRequest,
-): Promise<AuthenticationResponse> => {
-    const {data} = await api.post<AuthenticationResponse>(
-        '/auth/refresh-token',
         payload,
     )
     return data

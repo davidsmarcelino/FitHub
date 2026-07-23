@@ -222,5 +222,10 @@
       "CALVES": "Calves",
       "FULL_BODY": "Full Body"
     }
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try reloading the page.",
+    "reload": "Reload page"
   }
 }

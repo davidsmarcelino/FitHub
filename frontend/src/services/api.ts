@@ -138,11 +138,6 @@ api.interceptors.response.use(
       }
     }
 
-    if (error.response?.status === 401 && requestUrl.includes('/auth/refresh-token')) {
-      clearStoredSession()
-      redirectToLogin()
-    }
-
     return Promise.reject(error)
   },
 )

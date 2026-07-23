@@ -85,7 +85,7 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition hover:bg-accent"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition hover:bg-emerald-50 hover:text-emerald-600"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -163,7 +163,7 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
                 <button
                   type="submit"
                   disabled={isSubmitting || !form.name.trim()}
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110 disabled:opacity-60"
                 >
                   {isSubmitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />}
                   {isSubmitting ? t('createPlan.creating') : t('createPlan.createButton')}

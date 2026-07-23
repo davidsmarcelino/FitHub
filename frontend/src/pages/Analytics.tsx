@@ -72,7 +72,7 @@ const Analytics = () => {
       }
     }
     void load()
-  }, [period])
+  }, [period, mounted])
 
   const chartData = useMemo(
     () =>
@@ -114,33 +114,28 @@ const Analytics = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('badge')}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            {t('title')}
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            {t('subtitle')}
-          </p>
-        </div>
-        <div className="flex gap-1 rounded-xl border border-border bg-muted p-1">
-          {([7, 14, 30] as const).map((p) => (
-            <button
-              key={p}
-              type="button"
-              onClick={() => setPeriod(p)}
-              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${
-                period === p
-                  ? 'bg-background text-foreground shadow-soft'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {p}d
-            </button>
-          ))}
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <h1 className="text-2xl font-bold md:text-3xl">{t('title')}</h1>
+            <p className="mt-1 text-emerald-100">{t('subtitle')}</p>
+          </div>
+          <div className="flex gap-1 rounded-xl bg-white/20 p-1 backdrop-blur-sm">
+            {([7, 14, 30] as const).map((p) => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => setPeriod(p)}
+                className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${
+                  period === p
+                    ? 'bg-white text-emerald-700 shadow-sm'
+                    : 'text-emerald-100 hover:text-white'
+                }`}
+              >
+                {p}d
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

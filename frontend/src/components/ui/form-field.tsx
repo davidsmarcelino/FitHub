@@ -24,8 +24,8 @@ export const Input = ({ label, error, className, ...props }: InputProps) => {
   const input = (
     <input
       className={cn(
-        'flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground shadow-soft transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
-        error && 'border-destructive focus:ring-destructive',
+        'flex h-10 w-full rounded-xl border border-border bg-white px-3 py-2 text-sm text-foreground transition-all placeholder:text-muted-foreground focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50',
+        error && 'border-destructive focus:border-destructive focus:ring-destructive/20',
         className,
       )}
       {...props}
@@ -46,8 +46,8 @@ export const Textarea = ({ label, error, className, ...props }: TextareaProps) =
   const textarea = (
     <textarea
       className={cn(
-        'flex min-h-[80px] w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground shadow-soft transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
-        error && 'border-destructive focus:ring-destructive',
+        'flex min-h-[80px] w-full rounded-xl border border-border bg-white px-3 py-2 text-sm text-foreground transition-all placeholder:text-muted-foreground focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50',
+        error && 'border-destructive focus:border-destructive focus:ring-destructive/20',
         className,
       )}
       {...props}
@@ -69,8 +69,8 @@ export const Select = ({ label, error, className, options, ...props }: SelectPro
   const select = (
     <select
       className={cn(
-        'flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground shadow-soft transition-colors focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
-        error && 'border-destructive focus:ring-destructive',
+        'flex h-10 w-full rounded-xl border border-border bg-white px-3 py-2 text-sm text-foreground transition-all focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50',
+        error && 'border-destructive focus:border-destructive focus:ring-destructive/20',
         className,
       )}
       {...props}

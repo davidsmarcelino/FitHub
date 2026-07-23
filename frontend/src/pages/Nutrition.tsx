@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import {
@@ -105,7 +105,7 @@ const Nutrition = () => {
     POST_WORKOUT: [],
   })
 
-  const loadNutrition = async () => {
+  const loadNutrition = useCallback(async () => {
     setIsLoading(true)
     setErrors({})
 
@@ -152,11 +152,11 @@ const Nutrition = () => {
     } finally {
       if (mounted.current) setIsLoading(false)
     }
-  }
+  }, [mounted])
 
   useEffect(() => {
     void loadNutrition()
-  }, [])
+  }, [loadNutrition])
 
   const waterTarget = state.todayWater?.targetMl ?? profile?.dailyWaterTarget ?? 0
   const waterTotal = state.todayWater?.totalMl ?? 0
@@ -311,25 +311,21 @@ const Nutrition = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('badgeLabel')}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            {t('title')}
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            {t('subtitle')}
-          </p>
+      {/* Gradient header */}
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <h1 className="text-2xl font-bold md:text-3xl">{t('title')}</h1>
+            <p className="mt-1 text-emerald-100">{t('subtitle')}</p>
+          </div>
+          <Link
+            to="/profile"
+            className="inline-flex items-center gap-2 rounded-xl bg-white/20 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30"
+          >
+            <Target className="h-4 w-4" />
+            {t('editTargets')}
+          </Link>
         </div>
-        <Link
-          to="/profile"
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-soft transition-all hover:bg-accent"
-        >
-          <Target className="h-4 w-4" />
-          {t('editTargets')}
-        </Link>
       </div>
 
       <section className="grid gap-4 md:grid-cols-3">
@@ -388,7 +384,7 @@ const Nutrition = () => {
                         {t('water.ofTarget', { target: waterTarget || '—' })}
                       </p>
                     </div>
-                    <span className="rounded-full bg-sky-500/10 px-3 py-1 text-sm font-semibold text-sky-600 dark:text-sky-300">
+                    <span className="rounded-full bg-sky-500/10 px-3 py-1 text-sm font-semibold text-sky-600">
                       {Math.round(waterProgress)}%
                     </span>
                   </div>
@@ -402,7 +398,7 @@ const Nutrition = () => {
                       type="button"
                       disabled={isLoggingWater}
                       onClick={() => void handleLogWater(amount)}
-                      className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-background text-sm font-semibold text-foreground transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex h-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-700 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {t('water.quickAddAmount', { amount })}
                     </button>
@@ -423,10 +419,10 @@ const Nutrition = () => {
                   <button
                     type="submit"
                     disabled={isLoggingWater}
-                    className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition hover:shadow-xl hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isLoggingWater && (
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     )}
                     {t('water.logWater')}
                   </button>
@@ -526,7 +522,7 @@ const Nutrition = () => {
                   <button
                     type="submit"
                     disabled={isCreatingMealPlan}
-                    className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition hover:shadow-xl hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isCreatingMealPlan && (
                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
@@ -573,7 +569,7 @@ const Nutrition = () => {
       </section>
 
       {Object.keys(errors).length > 0 && !isLoading && (
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-200">
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700">
           {t('errors.loadFailed')}
         </div>
       )}
@@ -806,7 +802,7 @@ const MealItem = ({
           <span
             className={`rounded-full px-2 py-1 text-xs font-medium ${
               meal.completed
-                ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+                ? 'bg-green-500/10 text-green-600'
                 : 'bg-muted text-muted-foreground'
             }`}
           >
@@ -817,7 +813,7 @@ const MealItem = ({
               type="button"
               disabled={isCompleting}
               onClick={() => void onComplete(meal.id)}
-              className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-green-500/10 text-green-600 transition hover:bg-green-500/20 dark:text-green-400 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-green-500/10 text-green-600 transition hover:bg-green-500/20 disabled:cursor-not-allowed disabled:opacity-60"
               title={t('meal.markComplete')}
             >
               {isCompleting ? (

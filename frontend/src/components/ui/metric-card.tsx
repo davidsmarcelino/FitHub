@@ -27,7 +27,7 @@ export const MetricCard = ({ icon: Icon, title, value, label, tone }: MetricCard
             <p className="mt-3 line-clamp-2 text-xs text-muted-foreground">{label}</p>
           )}
         </div>
-        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone}`}>
+        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${tone}`}>
           <Icon className="h-5 w-5 text-white" />
         </div>
       </CardContent>
