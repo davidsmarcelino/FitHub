@@ -7,6 +7,7 @@ import {
   ListPlus,
   Play,
   Plus,
+  ArrowUpDown,
   StopCircle,
   UserPlus,
   Users2,
@@ -36,6 +37,7 @@ import { StatusBadge } from '../components/ui/status-badge'
 import { CreatePlanModal } from '../components/workouts/CreatePlanModal'
 import { AddExerciseModal } from '../components/workouts/AddExerciseModal'
 import { AssignPlanModal } from '../components/workouts/AssignPlanModal'
+import { PlanExerciseReorder } from '../components/workouts/PlanExerciseReorder'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import { useMountedRef } from '../utils/useMountedRef'
 import toast from '../utils/toast'
@@ -59,6 +61,7 @@ const TrainerWorkouts = () => {
   const [selectedPlan, setSelectedPlan] = useState<WorkoutPlanResponse | null>(null)
   const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false)
   const [isAssignOpen, setIsAssignOpen] = useState(false)
+  const [isReorderOpen, setIsReorderOpen] = useState(false)
   const [actioningId, setActioningId] = useState<string | null>(null)
   const mounted = useMountedRef()
 
@@ -78,7 +81,7 @@ const TrainerWorkouts = () => {
     } finally {
       if (mounted.current) setIsLoading(false)
     }
-  }, [])
+  }, [mounted])
 
   useEffect(() => {
     void loadData()
@@ -129,26 +132,25 @@ const TrainerWorkouts = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('title')}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            {t('detail.workspaceTitle', { name: trainerName })}
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            {t('detail.workspaceDesc')}
-          </p>
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <h1 className="text-2xl font-bold md:text-3xl">
+              {t('detail.workspaceTitle', { name: trainerName })}
+            </h1>
+            <p className="mt-1 text-emerald-100">
+              {t('detail.workspaceDesc')}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsCreateOpen(true)}
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-white/20 px-4 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/30"
+          >
+            <Plus className="h-4 w-4" />
+            {t('createPlan.createButton')}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => setIsCreateOpen(true)}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90"
-        >
-          <Plus className="h-4 w-4" />
-          {t('createPlan.createButton')}
-        </button>
       </div>
 
       {isLoading ? (
@@ -234,6 +236,19 @@ const TrainerWorkouts = () => {
                             <UserPlus className="h-3.5 w-3.5" />
                             {t('planCard.assign')}
                           </Button>
+                          {plan.exercises.length > 1 && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="rounded-xl text-xs"
+                              onClick={() => {
+                                setSelectedPlan(plan)
+                                setIsReorderOpen(true)
+                              }}
+                            >
+                              <ArrowUpDown className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
                         </div>
                       </motion.div>
                     ))}
@@ -385,6 +400,19 @@ const TrainerWorkouts = () => {
             plan={selectedPlan}
             onAssigned={async () => {
               setIsAssignOpen(false)
+              setSelectedPlan(null)
+              await loadData()
+            }}
+          />
+          <PlanExerciseReorder
+            isOpen={isReorderOpen}
+            onClose={() => {
+              setIsReorderOpen(false)
+              setSelectedPlan(null)
+            }}
+            plan={selectedPlan}
+            onReordered={async () => {
+              setIsReorderOpen(false)
               setSelectedPlan(null)
               await loadData()
             }}

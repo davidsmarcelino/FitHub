@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -22,8 +22,6 @@ import {
   CardHeader,
   CardTitle,
 } from '../components/ui/card'
-import { workoutStatusColors } from '../components/ui/status-badge'
-import { useMountedRef } from '../utils/useMountedRef'
 import {
   type ClientWorkoutPlanResponse,
   type WorkoutLogResponse,
@@ -38,7 +36,6 @@ import { formatDate, clampPercentage } from '../lib/utils'
 import { ProgressBar } from '../components/ui/progress-bar'
 import { EmptyState } from '../components/ui/empty-state'
 import { SkeletonBlock } from '../components/ui/skeleton'
-import { StatusBadge } from '../components/ui/status-badge'
 import { MetricCard } from '../components/ui/metric-card'
 import toast from '../utils/toast'
 
@@ -54,9 +51,8 @@ const WorkoutDetail = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isLogOpen, setIsLogOpen] = useState(false)
-  const mounted = useMountedRef()
 
-  const load = async (assignmentId: string) => {
+  const load = useCallback(async (assignmentId: string) => {
     setIsLoading(true)
     setError(null)
 
@@ -67,29 +63,27 @@ const WorkoutDetail = () => {
         getMyWorkoutLogs(0, 50),
       ])
 
-      if (mounted.current) {
-        setAssignment(assignmentData)
-        if (planResult.status === 'fulfilled') {
-          const planData = planResult.value
-          setPlan(planData)
-          const planExerciseIds = new Set(
-            planData.exercises.map((exercise) => exercise.exercise.exerciseId),
+      setAssignment(assignmentData)
+      if (planResult.status === 'fulfilled') {
+        const planData = planResult.value
+        setPlan(planData)
+        const planExerciseIds = new Set(
+          planData.exercises.map((exercise) => exercise.exercise.exerciseId),
+        )
+        if (logsResult.status === 'fulfilled') {
+          setRecentLogs(
+            logsResult.value.content
+              .filter((log) => planExerciseIds.has(log.exercise.exerciseId))
+              .slice(0, 8),
           )
-          if (logsResult.status === 'fulfilled') {
-            setRecentLogs(
-              logsResult.value.content
-                .filter((log) => planExerciseIds.has(log.exercise.exerciseId))
-                .slice(0, 8),
-            )
-          }
         }
       }
     } catch {
-      if (mounted.current) setError(t('detail.notAvailable'))
+      setError(t('detail.notAvailable'))
     } finally {
-      if (mounted.current) setIsLoading(false)
+      setIsLoading(false)
     }
-  }
+  }, [t])
 
   useEffect(() => {
     if (!id) {
@@ -98,7 +92,7 @@ const WorkoutDetail = () => {
     }
 
     void load(id)
-  }, [id, navigate])
+  }, [id, navigate, load])
 
   const exercisesByDay = useMemo(() => groupExercisesByDay(plan?.exercises ?? []), [plan])
   const progress = clampPercentage(assignment?.completionPercentage ?? 0)
@@ -155,50 +149,45 @@ const WorkoutDetail = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
-        <div>
-          <Link
-            to="/workouts"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            {t('detail.backToPlans')}
-          </Link>
-          <p className="mt-5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('detail.workoutPlan')}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            {plan.name}
-          </h1>
-          <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-            {plan.description}
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <StatusBadge 
-              status={plan.difficultyLevel} 
-              label={t(`difficulty.${plan.difficultyLevel}`)} 
-            />
-            <StatusBadge 
-              status={assignment.status} 
-              colors={workoutStatusColors}
-              label={t(`status.${assignment.status}`)} 
-            />
-            <StatusBadge 
-              status="COMPLETED" 
-              label={`${Math.round(progress)}${t('detail.complete')}`} 
-            />
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
+          <div>
+            <Link
+              to="/workouts"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-white hover:underline"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {t('detail.backToPlans')}
+            </Link>
+            <h1 className="mt-4 text-2xl font-bold md:text-3xl">
+              {plan.name}
+            </h1>
+            <p className="mt-1 max-w-3xl text-sm text-emerald-100">
+              {plan.description}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="inline-flex items-center rounded-full bg-white/20 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+                {t(`difficulty.${plan.difficultyLevel}`)}
+              </span>
+              <span className="inline-flex items-center rounded-full bg-white/20 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+                {t(`status.${assignment.status}`)}
+              </span>
+              <span className="inline-flex items-center rounded-full bg-white/20 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+                {Math.round(progress)}{t('detail.complete')}
+              </span>
+            </div>
           </div>
-        </div>
 
-        <button
-          type="button"
-          onClick={() => setIsLogOpen(true)}
-          disabled={!plan.exercises.length}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <Dumbbell className="h-4 w-4" />
-          {t('detail.logWorkout')}
-        </button>
+          <button
+            type="button"
+            onClick={() => setIsLogOpen(true)}
+            disabled={!plan.exercises.length}
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-white/20 px-4 text-sm font-semibold text-white shadow-lg backdrop-blur-sm transition-all hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <Dumbbell className="h-4 w-4" />
+            {t('detail.logWorkout')}
+          </button>
+        </div>
       </div>
 
       <section className="grid gap-4 md:grid-cols-3">

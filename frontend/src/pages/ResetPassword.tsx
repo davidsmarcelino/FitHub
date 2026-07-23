@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Dumbbell, Lock, ShieldCheck } from 'lucide-react'
-import ThemeToggle from '../components/ThemeToggle'
 import { resetPassword } from '../services/auth.service'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
@@ -73,24 +72,20 @@ const ResetPassword = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
-      <div className="absolute right-4 top-4">
-        <ThemeToggle />
-      </div>
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-            <Dumbbell className="h-6 w-6 text-primary-foreground" />
+        <div className="mb-8 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-center text-white md:p-8">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/20">
+            <Dumbbell className="h-6 w-6 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold md:text-3xl">
             {t('resetPassword.title')}
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm text-emerald-100">
             {t('resetPassword.subtitle')}
           </p>
         </div>
@@ -171,10 +166,10 @@ const ResetPassword = () => {
             <button
               type="submit"
               disabled={isSubmitting || !token.trim()}
-              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting && (
-                <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
               )}
               <span>{isSubmitting ? t('resetPassword.submittingButton') : t('resetPassword.submitButton')}</span>
             </button>

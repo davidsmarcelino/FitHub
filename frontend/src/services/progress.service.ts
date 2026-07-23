@@ -1,5 +1,5 @@
-import axios from 'axios'
 import api from './api'
+import { handleNotFound } from './api-helpers'
 import type { PageResponse } from '../types/common.types'
 import type {
   BodyMeasurementResponse,
@@ -112,19 +112,10 @@ export const completeGoal = async (
 // ==================== Body Measurements ====================
 
 export const getLatestBodyMeasurement =
-  async (): Promise<BodyMeasurementResponse | null> => {
-    try {
-      const { data } = await api.get<BodyMeasurementResponse>(
-        '/progress/measurements/latest',
-      )
-      return data
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        return null
-      }
-      throw error
-    }
-  }
+  async (): Promise<BodyMeasurementResponse | null> =>
+    handleNotFound(() =>
+      api.get<BodyMeasurementResponse>('/progress/measurements/latest').then((r) => r.data),
+    )
 
 export const getBodyMeasurements = async (
   page = 0,

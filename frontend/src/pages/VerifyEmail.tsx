@@ -5,7 +5,6 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { CheckCircle2, Mail, RotateCcw, ShieldCheck } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { resendVerification, verifyEmail } from '../services/auth.service'
-import ThemeToggle from '../components/ThemeToggle'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
 
@@ -80,10 +79,6 @@ const VerifyEmail = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
-      <div className="absolute right-4 top-4">
-        <ThemeToggle />
-      </div>
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -91,15 +86,15 @@ const VerifyEmail = () => {
         className="w-full max-w-lg"
       >
         <div className="rounded-2xl border border-border bg-card p-6 shadow-soft-lg">
-          <div className="mb-6">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground">
-              <ShieldCheck className="h-3.5 w-3.5 text-success" />
+          <div className="mb-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+              <ShieldCheck className="h-3.5 w-3.5 text-white" />
               {t('verifyEmail.badge')}
             </div>
-            <h1 className="text-2xl font-bold text-card-foreground">
+            <h1 className="text-2xl font-bold md:text-3xl">
               {t('verifyEmail.title')}
             </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 text-sm text-emerald-100">
               {t('verifyEmail.subtitle')}
             </p>
           </div>
@@ -126,7 +121,7 @@ const VerifyEmail = () => {
               <button
                 type="submit"
                 disabled={isSubmitting || !token.trim()}
-                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSubmitting ? t('verifyEmail.verifyingButton') : t('verifyEmail.verifyButton')}
               </button>

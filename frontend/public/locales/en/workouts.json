@@ -37,6 +37,8 @@
   "planCard": {
     "addExercise": "Exercises",
     "assign": "Assign",
+    "reorder": "Reorder",
+    "reorderDescription": "Drag exercises to reorder them within each day",
     "sessionsPerWeek": "{{count}} sessions/week",
     "weeks": "{{count}} weeks",
     "complete": "{{count}}% complete",
@@ -94,12 +96,7 @@
     "creating": "Creating...",
     "createButton": "Create plan",
     "toastSuccess": "Workout plan created successfully.",
-    "toastError": "Failed to create workout plan.",
-    "validation": {
-      "nameRequired": "Plan name is required.",
-      "weeksInvalid": "Duration must be at least 1 week.",
-      "sessionsInvalid": "Sessions per week must be between 1 and 7."
-    }
+    "toastError": "Failed to create workout plan."
   },
   "addExercise": {
     "badge": "Add exercise",
@@ -117,11 +114,8 @@
     "adding": "Adding...",
     "addButton": "Add exercise",
     "toastSuccess": "Exercise added to plan.",
-    "toastError": "Failed to add exercise.",
-    "loadExercisesFailed": "Failed to load exercises.",
-    "validation": {
-      "exerciseRequired": "Please select an exercise."
-    }
+    "toastError": "Failed to add exercise to plan.",
+    "loadExercisesFailed": "Failed to load exercises."
   },
   "exercisePicker": {
     "searchPlaceholder": "Search exercises...",
@@ -194,8 +188,7 @@
     "day": "Day {{n}}",
     "exercises": "{{count}} exercise(s)",
     "setsReps": "{{sets}} sets x {{reps}} reps",
-    "restTime": "{{n}}s rest",
-    "exerciseDuration": "{{n}}s duration"
+    "restTime": "{{n}}s rest"
   },
   "status": {
     "NOT_STARTED": "Not started",

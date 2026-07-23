@@ -37,6 +37,8 @@
   "planCard": {
     "addExercise": "Упражнения",
     "assign": "Назначить",
+    "reorder": "Изменить порядок",
+    "reorderDescription": "Перетащите упражнения, чтобы изменить порядок в рамках дня",
     "sessionsPerWeek": "{{count}} тренировок/неделю",
     "weeks": "{{count}} недель",
     "complete": "{{count}}% выполнено",

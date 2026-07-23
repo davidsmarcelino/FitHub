@@ -1,8 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, Star } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -19,6 +19,7 @@ import {
   type TrainerProfileResponse,
 } from '../services/profile.service'
 import { getSpecializations, type SpecializationResponse } from '../services/specialization.service'
+import { getTrainerReviewSummary, type TrainerReviewSummaryResponse } from '../services/trainer.service'
 import { useAuthStore } from '../store/useAuthStore'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import { useMountedRef } from '../utils/useMountedRef'
@@ -53,8 +54,18 @@ const TrainerProfile = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [reviewSummary, setReviewSummary] = useState<TrainerReviewSummaryResponse | null>(null)
 
   const mounted = useMountedRef()
+
+  const loadReviewSummary = useCallback(async () => {
+    try {
+      const summary = await getTrainerReviewSummary()
+      if (mounted.current) setReviewSummary(summary)
+    } catch {
+      // Review summary is optional, don't show error
+    }
+  }, [mounted])
 
   useEffect(() => {
     const load = async () => {
@@ -84,10 +95,11 @@ const TrainerProfile = () => {
         setError(getApiErrorMessage(err, t('common:errors.serverError')))
       } finally {
         if (mounted.current) setIsLoading(false)
+        void loadReviewSummary()
       }
     }
     void load()
-  }, [])
+  }, [mounted, t, loadReviewSummary])
 
   const updateField = (field: keyof TrainerForm, value: string | string[]) => {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -162,19 +174,55 @@ const TrainerProfile = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {profile ? t('badge') : t('setup')}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            {fullName}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {profile ? t('subtitle') : t('setupDesc')}
-          </p>
-        </div>
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <h1 className="text-2xl font-bold md:text-3xl">{fullName}</h1>
+        <p className="mt-1 text-emerald-100">
+          {profile ? t('subtitle') : t('setupDesc')}
+        </p>
       </div>
+
+      {reviewSummary && reviewSummary.totalReviews > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Card className="border-border bg-card shadow-soft">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Star className="h-5 w-5 text-amber-500" />
+                {t('reviewSummary.title')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="rounded-2xl border border-border bg-background p-4 text-center">
+                  <p className="text-3xl font-bold text-foreground">
+                    {reviewSummary.averageRating?.toFixed(1) ?? '—'}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t('reviewSummary.averageRating')}</p>
+                </div>
+                <div className="rounded-2xl border border-border bg-background p-4 text-center">
+                  <p className="text-3xl font-bold text-foreground">{reviewSummary.totalReviews}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t('reviewSummary.totalReviews')}</p>
+                </div>
+                <div className="rounded-2xl border border-border bg-background p-4 text-center">
+                  <p className="text-3xl font-bold text-foreground">
+                    {reviewSummary.professionalismAverage?.toFixed(1) ?? '—'}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t('reviewSummary.professionalism')}</p>
+                </div>
+                <div className="rounded-2xl border border-border bg-background p-4 text-center">
+                  <p className="text-3xl font-bold text-foreground">
+                    {reviewSummary.knowledgeAverage?.toFixed(1) ?? '—'}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t('reviewSummary.knowledge')}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {isLoading ? (
         <div className="h-96 animate-pulse rounded-2xl bg-muted" />
@@ -280,7 +328,7 @@ const TrainerProfile = () => {
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
+                    className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110 disabled:opacity-60"
                   >
                     {isSaving && (
                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />

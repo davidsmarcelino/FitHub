@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import {
@@ -16,6 +16,7 @@ import {
   getMyAttendance,
   joinSession,
   joinWaitlist,
+  leaveWaitlist,
   type TrainingSessionResponse,
 } from '../services/workout.service'
 import { getApiErrorMessage } from '../utils/errorHandler'
@@ -42,7 +43,7 @@ const Sessions = () => {
   const [totalPages, setTotalPages] = useState(1)
   const mounted = useMountedRef()
 
-  const loadSessions = async (page = 0) => {
+  const loadSessions = useCallback(async (page = 0) => {
     setIsLoading(true)
     setError(null)
     try {
@@ -65,11 +66,11 @@ const Sessions = () => {
     } finally {
       if (mounted.current) setIsLoading(false)
     }
-  }
+  }, [isClient, mounted, t])
 
   useEffect(() => {
     void loadSessions()
-  }, [isClient])
+  }, [loadSessions])
 
   const handleJoin = async (sessionId: string) => {
     setJoiningId(sessionId)
@@ -92,6 +93,19 @@ const Sessions = () => {
       await loadSessions()
     } catch (err) {
       toast.error(getApiErrorMessage(err, t('errors.joinFailed')))
+    } finally {
+      setJoiningId(null)
+    }
+  }
+
+  const handleLeaveWaitlist = async (sessionId: string) => {
+    setJoiningId(sessionId)
+    try {
+      await leaveWaitlist(sessionId)
+      toast.success(t('leftWaitlist'))
+      await loadSessions()
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, t('errors.leaveWaitlistFailed')))
     } finally {
       setJoiningId(null)
     }
@@ -124,18 +138,9 @@ const Sessions = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('badge')}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            {t('title')}
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            {t('subtitle')}
-          </p>
-        </div>
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <h1 className="text-2xl font-bold md:text-3xl">{t('title')}</h1>
+        <p className="mt-1 text-emerald-100">{t('subtitle')}</p>
       </div>
 
       {error && !isLoading && (
@@ -144,7 +149,7 @@ const Sessions = () => {
         </div>
       )}
 
-      <div className="flex gap-1 overflow-x-auto rounded-xl border border-border bg-muted p-1" role="tablist">
+      <div className="flex gap-1 overflow-x-auto rounded-xl bg-gray-100 p-1" role="tablist">
         {(['all', 'upcoming', 'past'] as const).map((filter) => (
           <button
             key={filter}
@@ -154,7 +159,7 @@ const Sessions = () => {
             onClick={() => setActiveFilter(filter)}
             className={`inline-flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition ${
               activeFilter === filter
-                ? 'bg-background text-foreground shadow-soft'
+                ? 'bg-white text-emerald-700 shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -185,6 +190,7 @@ const Sessions = () => {
                   isJoined={joinedSessionIds.has(session.id)}
                   onJoin={() => void handleJoin(session.id)}
                   onWaitlist={() => void handleWaitlist(session.id)}
+                  onLeaveWaitlist={() => void handleLeaveWaitlist(session.id)}
                   isPast={isPast}
                 />
               )
@@ -216,6 +222,7 @@ const SessionCard = ({
   isJoined,
   onJoin,
   onWaitlist,
+  onLeaveWaitlist,
   isPast = false,
 }: {
   session: TrainingSessionResponse
@@ -224,6 +231,7 @@ const SessionCard = ({
   isJoined: boolean
   onJoin: () => void
   onWaitlist: () => void
+  onLeaveWaitlist: () => void
   isPast?: boolean
 }) => {
   const { t } = useTranslation(['sessions', 'common'])
@@ -246,14 +254,14 @@ const SessionCard = ({
           <div className="flex items-center gap-2">
             <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
               session.type === 'GROUP'
-                ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                : 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
+                ? 'bg-blue-500/10 text-blue-600'
+                : 'bg-violet-500/10 text-violet-600'
             }`}>
               {t('common:enums.trainingType.' + session.type)}
             </span>
             <StatusBadge status={session.status} colors={sessionStatusColors} label={t('status.' + session.status)} />
             {isJoined && !isPast && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-600">
                 <CheckCircle className="h-3 w-3" />
                 {t('joined')}
               </span>
@@ -287,28 +295,38 @@ const SessionCard = ({
       {isClient && !isPast && session.status === 'SCHEDULED' && (
         <div className="mt-4">
           {isJoined ? (
-            <p className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+            <p className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600">
               <CheckCircle className="h-3.5 w-3.5" />
               {t('alreadyJoined')}
             </p>
           ) : isFull ? (
-            <button
-              type="button"
-              disabled={isJoining}
-              onClick={onWaitlist}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground transition-all hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isJoining ? (
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
-              ) : null}
-              {isJoining ? t('joining') : t('sessionFull')}
-            </button>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                disabled={isJoining}
+                onClick={onWaitlist}
+                className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground transition-all hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isJoining ? (
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
+                ) : null}
+                {isJoining ? t('joining') : t('sessionFull')}
+              </button>
+              <button
+                type="button"
+                disabled={isJoining}
+                onClick={onLeaveWaitlist}
+                className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-4 text-sm font-semibold text-destructive transition-all hover:bg-destructive/20 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {t('leaveWaitlist')}
+              </button>
+            </div>
           ) : (
             <button
               type="button"
               disabled={isJoining}
               onClick={onJoin}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isJoining ? (
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />

@@ -59,7 +59,7 @@ const TrainerSessions = () => {
     return () => clearTimeout(timer)
   }, [clientSearchQuery, doClientSearch])
 
-  const loadSessions = async (page = 0) => {
+  const loadSessions = useCallback(async (page = 0) => {
     setIsLoading(true)
     try {
       const result = await getTrainingSessions(page, 12)
@@ -73,11 +73,11 @@ const TrainerSessions = () => {
     } finally {
       if (mounted.current) setIsLoading(false)
     }
-  }
+  }, [mounted, t])
 
   useEffect(() => {
     void loadSessions()
-  }, [])
+  }, [loadSessions])
 
   const handleCheckIn = async (sessionId: string) => {
     const clientId = selectedClient?.id ?? checkInClientId.trim()
@@ -114,15 +114,21 @@ const TrainerSessions = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
-          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <h1 className="text-2xl font-bold md:text-3xl">{t('title')}</h1>
+            <p className="mt-1 text-emerald-100">{t('subtitle')}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsCreateModalOpen(true)}
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-white/20 px-4 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/30"
+          >
+            <Plus className="h-4 w-4" />
+            {t('common:buttons.create')}
+          </button>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('common:buttons.create')}
-        </Button>
       </div>
 
       {isLoading ? (

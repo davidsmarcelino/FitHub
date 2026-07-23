@@ -24,20 +24,24 @@ const ProfileOnboardingGate = () => {
 
   useEffect(() => {
     if (!isClient && !isTrainer) {
+      setIsCheckingProfile(false)
       return
     }
 
     if (isClient && !hasClientProfile && !isOnboardingRoute) {
+      setIsCheckingProfile(false)
       navigate('/onboarding', { replace: true })
       return
     }
 
     if (isTrainer && !hasTrainerProfile && !isTrainerProfileRoute) {
+      setIsCheckingProfile(false)
       navigate('/trainer-profile', { replace: true })
       return
     }
 
     if (!isOnboardingRoute && !isTrainerProfileRoute) {
+      setIsCheckingProfile(false)
       return
     }
 
@@ -85,7 +89,7 @@ const ProfileOnboardingGate = () => {
     return () => {
       isMounted = false
     }
-  }, [isClient, isTrainer, isOnboardingRoute, isTrainerProfileRoute, navigate, hasClientProfile, hasTrainerProfile])
+  }, [isClient, isTrainer, isOnboardingRoute, isTrainerProfileRoute, navigate, hasClientProfile, hasTrainerProfile, t])
 
   if (!isClient && !isTrainer && (isOnboardingRoute || isTrainerProfileRoute) && roles.length > 0) {
     return <Navigate to="/dashboard" replace />

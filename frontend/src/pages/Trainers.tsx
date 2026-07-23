@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import {
@@ -39,7 +39,7 @@ const Trainers = () => {
   const [totalPages, setTotalPages] = useState(1)
   const mounted = useMountedRef()
 
-  const loadTrainers = async (query?: string, page = 0) => {
+  const loadTrainers = useCallback(async (query?: string, page = 0) => {
     setIsLoading(true)
     try {
       const pageResult = await getTrainers(page, 12, query)
@@ -53,11 +53,11 @@ const Trainers = () => {
     } finally {
       if (mounted.current) setIsLoading(false)
     }
-  }
+  }, [mounted, t])
 
   useEffect(() => {
     void loadTrainers()
-  }, [])
+  }, [loadTrainers])
 
   const handleSearch = () => {
     void loadTrainers(search.trim() || undefined, 0)
@@ -83,18 +83,9 @@ const Trainers = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('badge')}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            {t('title')}
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            {t('subtitle')}
-          </p>
-        </div>
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <h1 className="text-2xl font-bold md:text-3xl">{t('title')}</h1>
+        <p className="mt-1 text-emerald-100">{t('subtitle')}</p>
       </div>
 
       <div className="flex gap-2">
@@ -111,7 +102,7 @@ const Trainers = () => {
         <button
           type="button"
           onClick={handleSearch}
-          className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90"
+          className="inline-flex h-10 items-center justify-center rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110"
         >
           {t('searchButton')}
         </button>
@@ -308,7 +299,7 @@ const TrainerDetailModal = ({
             <button
               type="button"
               onClick={() => setShowReviewForm(!showReviewForm)}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-xl bg-primary px-3 text-xs font-semibold text-primary-foreground transition hover:bg-primary/90"
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-3 text-xs font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110"
             >
               <Star className="h-3 w-3" />
               {t('reviews.writeReview')}
@@ -417,7 +408,7 @@ const ReviewForm = ({
         <button type="button" onClick={onCancel} disabled={isSubmitting} className="inline-flex h-9 items-center justify-center rounded-xl px-4 text-sm font-medium text-foreground transition hover:bg-accent disabled:opacity-60">
           {t('common:buttons.cancel')}
         </button>
-        <button type="submit" disabled={isSubmitting} className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60">
+        <button type="submit" disabled={isSubmitting} className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110 disabled:opacity-60">
           {isSubmitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />}
           {t('reviews.submitButton')}
         </button>

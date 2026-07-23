@@ -1,42 +1,17 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
-import {
-  ArrowRight,
-  CalendarDays,
-  CheckCircle2,
-  Dumbbell,
-  History,
-  ListChecks,
-  Play,
-  Trophy,
-  User2,
-} from 'lucide-react'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '../components/ui/card'
+import { CalendarDays, CheckCircle2, Dumbbell, History, ListChecks, Play, Trophy, User2 } from 'lucide-react'
+import { Card, CardContent } from '../components/ui/card'
 import { StatusBadge, assignmentStatusColors } from '../components/ui/status-badge'
 import { useAuthStore } from '../store/useAuthStore'
-import {
-  type ClientWorkoutPlanResponse,
-  type WorkoutLogResponse,
-  type WorkoutPlanExerciseResponse,
-  getMyActiveAssignments,
-  getMyAssignments,
-  getMyWorkoutLogs,
-  getWorkoutPlanById,
-} from '../services/workout.service'
+import { type ClientWorkoutPlanResponse, type WorkoutLogResponse, type WorkoutPlanExerciseResponse, getMyActiveAssignments, getMyAssignments, getMyWorkoutLogs, getWorkoutPlanById } from '../services/workout.service'
 import { LogWorkoutModal } from '../components/workouts/LogWorkoutModal'
-import { formatDate, clampPercentage, type IconType } from '../lib/utils'
+import { formatDate, clampPercentage } from '../lib/utils'
 import { useMountedRef } from '../utils/useMountedRef'
 import { ProgressBar } from '../components/ui/progress-bar'
 import { EmptyState } from '../components/ui/empty-state'
-import { SkeletonCard, SkeletonBlock, SkeletonLine } from '../components/ui/skeleton'
 
 type WorkoutsState = {
   activeAssignments: ClientWorkoutPlanResponse[]
@@ -49,11 +24,7 @@ const Workouts = () => {
   const user = useAuthStore((state) => state.user)
   const roles = useAuthStore((state) => state.roles)
   const isClient = roles.includes('CLIENT')
-  const [state, setState] = useState<WorkoutsState>({
-    activeAssignments: [],
-    allAssignments: [],
-    recentLogs: [],
-  })
+  const [state, setState] = useState<WorkoutsState>({ activeAssignments: [], allAssignments: [], recentLogs: [] })
   const [isLoading, setIsLoading] = useState(true)
   const mounted = useMountedRef()
   const [error, setError] = useState<string | null>(null)
@@ -63,347 +34,144 @@ const Workouts = () => {
 
   const handleStartWorkout = async (assignment: ClientWorkoutPlanResponse) => {
     setSelectedAssignment(assignment)
-    try {
-      const plan = await getWorkoutPlanById(assignment.workoutPlan.id)
-      setSelectedExercises(plan.exercises)
-    } catch {
-      setSelectedExercises([])
-    }
+    try { const plan = await getWorkoutPlanById(assignment.workoutPlan.id); setSelectedExercises(plan.exercises) } catch { setSelectedExercises([]) }
     setIsLogOpen(true)
   }
 
-  const loadData = async () => {
-    if (!isClient) {
-      setIsLoading(false)
-      return
-    }
-
-    setIsLoading(true)
-    setError(null)
-
+  const loadData = useCallback(async () => {
+    if (!isClient) { setIsLoading(false); return }
+    setIsLoading(true); setError(null)
     try {
-      const [activeResult, allResult, logsResult] = await Promise.allSettled([
-        getMyActiveAssignments(),
-        getMyAssignments(),
-        getMyWorkoutLogs(0, 5),
-      ])
+      const [activeResult, allResult, logsResult] = await Promise.allSettled([getMyActiveAssignments(), getMyAssignments(), getMyWorkoutLogs(0, 5)])
+      if (mounted.current) setState({
+        activeAssignments: activeResult.status === 'fulfilled' ? activeResult.value : [],
+        allAssignments: allResult.status === 'fulfilled' ? allResult.value : [],
+        recentLogs: logsResult.status === 'fulfilled' ? logsResult.value.content : [],
+      })
+    } catch { if (mounted.current) setError(t('errorLoading')) } finally { if (mounted.current) setIsLoading(false) }
+  }, [isClient, mounted, t])
 
-      if (mounted.current) {
-        setState({
-          activeAssignments: activeResult.status === 'fulfilled' ? activeResult.value : [],
-          allAssignments: allResult.status === 'fulfilled' ? allResult.value : [],
-          recentLogs: logsResult.status === 'fulfilled' ? logsResult.value.content : [],
-        })
-      }
-    } catch {
-      if (mounted.current) setError(t('errorLoading'))
-    } finally {
-      if (mounted.current) setIsLoading(false)
-    }
-  }
+  useEffect(() => { void loadData() }, [loadData])
 
-  useEffect(() => {
-    void loadData()
-  }, [isClient])
+  const titleName = user?.clientProfile?.firstname || user?.clientProfile?.lastname || t('common:fallbacks.client')
+  const totalCompleted = useMemo(() => state.allAssignments.reduce((sum, a) => sum + (a.completedWorkouts ?? 0), 0), [state.allAssignments])
+  const averageCompletion = useMemo(() => { if (!state.allAssignments.length) return 0; return Math.round(state.allAssignments.reduce((s, a) => s + (a.completionPercentage ?? 0), 0) / state.allAssignments.length) }, [state.allAssignments])
 
-  const titleName =
-    user?.clientProfile?.firstname || user?.clientProfile?.lastname || t('common:fallbacks.client')
-
-  const totalCompleted = useMemo(
-    () =>
-      state.allAssignments.reduce(
-        (sum, assignment) => sum + (assignment.completedWorkouts ?? 0),
-        0,
-      ),
-    [state.allAssignments],
-  )
-
-  const averageCompletion = useMemo(() => {
-    if (!state.allAssignments.length) return 0
-    const total = state.allAssignments.reduce(
-      (sum, assignment) => sum + (assignment.completionPercentage ?? 0),
-      0,
-    )
-    return Math.round(total / state.allAssignments.length)
-  }, [state.allAssignments])
-
-  const handleLogged = async () => {
-    setIsLogOpen(false)
-    setSelectedAssignment(null)
-    setSelectedExercises([])
-    await loadData()
-  }
+  const handleLogged = async () => { setIsLogOpen(false); setSelectedAssignment(null); setSelectedExercises([]); await loadData() }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('badge')}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            {t('subtitle')}, {titleName}
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            {t('headerDesc')}
-          </p>
+      {/* Header */}
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <h1 className="text-2xl font-bold md:text-3xl">{t('subtitle')}, {titleName}</h1>
+            <p className="mt-1 text-emerald-100">{t('headerDesc')}</p>
+          </div>
+          <Link to="/sessions" className="inline-flex items-center gap-2 rounded-xl bg-white/20 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/30">
+            <CalendarDays className="h-4 w-4" /> {t('viewSessions')}
+          </Link>
         </div>
-
-        <Link
-          to="/sessions"
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-soft transition-all hover:bg-accent"
-        >
-          <CalendarDays className="h-4 w-4" />
-          {t('viewSessions')}
-        </Link>
       </div>
 
-      {error && !isLoading && (
-        <div className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {error}
-        </div>
-      )}
+      {error && !isLoading && <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>}
 
-      <section className="grid gap-4 md:grid-cols-3">
-        {isLoading ? (
-          Array.from({ length: 3 }).map((_, index) => (
-            <SkeletonCard key={index} className="h-32" />
-          ))
-        ) : (
+      {/* Summary stats */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        {isLoading ? Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-24 animate-pulse rounded-2xl bg-emerald-50" />) : (
           <>
-            <SummaryCard
-              icon={Dumbbell}
-              label={t('summary.activePlans')}
-              value={state.activeAssignments.length.toString()}
-              detail={t('summary.activePlansDetail')}
-            />
-            <SummaryCard
-              icon={ListChecks}
-              label={t('summary.loggedWorkouts')}
-              value={totalCompleted.toString()}
-              detail={t('summary.loggedWorkoutsDetail')}
-            />
-            <SummaryCard
-              icon={Trophy}
-              label={t('summary.avgCompletion')}
-              value={`${averageCompletion}%`}
-              detail={t('summary.avgCompletionDetail')}
-            />
+            <QuickStat icon={Dumbbell} label={t('summary.activePlans')} value={state.activeAssignments.length.toString()} color="emerald" />
+            <QuickStat icon={ListChecks} label={t('summary.loggedWorkouts')} value={totalCompleted.toString()} color="blue" />
+            <QuickStat icon={Trophy} label={t('summary.avgCompletion')} value={`${averageCompletion}%`} color="violet" />
           </>
         )}
-      </section>
+      </div>
 
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.3fr),minmax(360px,0.7fr)]">
+      {/* Active plans + Recent logs */}
+      <div className="grid gap-6 xl:grid-cols-[1fr,380px]">
         <Card>
-          <CardHeader>
-            <CardTitle>{t('activePlans.title')}</CardTitle>
-            <CardDescription>
-              {t('activePlans.desc')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="grid gap-4 md:grid-cols-2">
-                <SkeletonBlock />
-                <SkeletonBlock />
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">{t('activePlans.title')}</h2>
+              <Link to="/trainers" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">{t('activePlans.exploreTrainers')} →</Link>
+            </div>
+            {isLoading ? <div className="mt-4 grid gap-4 md:grid-cols-2">{Array.from({ length: 2 }).map((_, i) => <div key={i} className="h-48 animate-pulse rounded-xl bg-emerald-50" />)}</div> : state.activeAssignments.length ? (
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {state.activeAssignments.map((a) => <WorkoutCard key={a.id} assignment={a} onStart={() => handleStartWorkout(a)} />)}
               </div>
-            ) : state.activeAssignments.length ? (
-              <div className="grid gap-4 md:grid-cols-2">
-                {state.activeAssignments.map((assignment) => (
-                  <WorkoutCard
-                    key={assignment.id}
-                    assignment={assignment}
-                    onStart={() => handleStartWorkout(assignment)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <EmptyState
-                icon={Dumbbell}
-                title={t('activePlans.empty')}
-                description={t('activePlans.emptyDesc')}
-                actionLabel={t('activePlans.exploreTrainers')}
-                to="/trainers"
-              />
-            )}
+            ) : <EmptyState icon={Dumbbell} title={t('activePlans.empty')} description={t('activePlans.emptyDesc')} actionLabel={t('activePlans.exploreTrainers')} to="/trainers" />}
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>{t('recentLogs.title')}</CardTitle>
-            <CardDescription>
-              {t('recentLogs.desc')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="space-y-3">
-                <SkeletonLine />
-                <SkeletonLine />
-                <SkeletonLine />
+          <CardContent className="p-6">
+            <h2 className="text-lg font-semibold text-gray-900">{t('recentLogs.title')}</h2>
+            {isLoading ? <div className="mt-4 space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-16 animate-pulse rounded-xl bg-emerald-50" />)}</div> : state.recentLogs.length ? (
+              <div className="mt-4 space-y-3">
+                {state.recentLogs.map((log) => <LogRow key={log.id} log={log} />)}
               </div>
-            ) : state.recentLogs.length ? (
-              <div className="space-y-3">
-                {state.recentLogs.map((log) => (
-                  <LogRow key={log.id} log={log} />
-                ))}
-              </div>
-            ) : (
-              <EmptyState
-                icon={History}
-                title={t('recentLogs.empty')}
-                description={t('recentLogs.emptyDesc')}
-                actionLabel={t('recentLogs.viewPlans')}
-                to="/workouts"
-              />
-            )}
+            ) : <EmptyState icon={History} title={t('recentLogs.empty')} description={t('recentLogs.emptyDesc')} />}
           </CardContent>
         </Card>
-      </section>
+      </div>
 
+      {/* History */}
       <Card>
-        <CardHeader>
-          <CardTitle>{t('planHistory.title')}</CardTitle>
-          <CardDescription>
-            {t('planHistory.desc')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="space-y-3">
-              <SkeletonLine />
-              <SkeletonLine />
+        <CardContent className="p-6">
+          <h2 className="text-lg font-semibold text-gray-900">{t('planHistory.title')}</h2>
+          {isLoading ? <div className="mt-4 space-y-3">{Array.from({ length: 2 }).map((_, i) => <div key={i} className="h-16 animate-pulse rounded-xl bg-emerald-50" />)}</div> : state.allAssignments.length ? (
+            <div className="mt-4 space-y-2">
+              {state.allAssignments.map((a) => <HistoryRow key={a.id} assignment={a} />)}
             </div>
-          ) : state.allAssignments.length ? (
-            <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border">
-              {state.allAssignments.map((assignment) => (
-                <HistoryRow key={assignment.id} assignment={assignment} />
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              icon={CheckCircle2}
-              title={t('planHistory.empty')}
-              description={t('planHistory.emptyDesc')}
-              actionLabel={t('planHistory.backToDashboard')}
-              to="/dashboard"
-            />
-          )}
+          ) : <EmptyState icon={CheckCircle2} title={t('planHistory.empty')} description={t('planHistory.emptyDesc')} />}
         </CardContent>
       </Card>
 
-      {selectedAssignment && (
-        <LogWorkoutModal
-          isOpen={isLogOpen}
-          onClose={() => {
-            setIsLogOpen(false)
-            setSelectedAssignment(null)
-            setSelectedExercises([])
-          }}
-          assignment={selectedAssignment}
-          exercises={selectedExercises}
-          onLogged={handleLogged}
-        />
-      )}
+      {selectedAssignment && <LogWorkoutModal isOpen={isLogOpen} onClose={() => { setIsLogOpen(false); setSelectedAssignment(null); setSelectedExercises([]) }} assignment={selectedAssignment} exercises={selectedExercises} onLogged={handleLogged} />}
     </div>
   )
 }
 
-const SummaryCard = ({
-  icon: Icon,
-  label,
-  value,
-  detail,
-}: {
-  icon: IconType
-  label: string
-  value: string
-  detail: string
-}) => (
-  <Card>
-      <CardContent className="flex items-center justify-between gap-4 p-5">
-      <div>
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
-        <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
-        <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
-      </div>
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-        <Icon className="h-5 w-5 text-primary" />
-      </div>
-    </CardContent>
-  </Card>
+const QuickStat = ({ icon: Icon, label, value, color }: { icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; label: string; value: string; color: string }) => (
+  <div className="flex items-center gap-4 rounded-2xl bg-white p-4 shadow-soft transition-shadow hover:shadow-soft-md">
+    <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${color === 'emerald' ? 'bg-emerald-100 text-emerald-600' : color === 'blue' ? 'bg-blue-100 text-blue-600' : 'bg-violet-100 text-violet-600'}`}>
+      <Icon className="h-5 w-5" />
+    </div>
+    <div>
+      <p className="text-xs font-medium text-gray-500">{label}</p>
+      <p className="text-xl font-bold text-gray-900">{value}</p>
+    </div>
+  </div>
 )
 
-const WorkoutCard = ({
-  assignment,
-  onStart,
-}: {
-  assignment: ClientWorkoutPlanResponse
-  onStart: () => void
-}) => {
+const WorkoutCard = ({ assignment, onStart }: { assignment: ClientWorkoutPlanResponse; onStart: () => void }) => {
   const { t } = useTranslation(['workouts', 'common'])
   const plan = assignment.workoutPlan
   const progress = clampPercentage(assignment.completionPercentage ?? 0)
-  const trainerName =
-    [plan.trainer.firstname, plan.trainer.lastname].filter(Boolean).join(' ') ||
-    t('detail.trainer')
+  const trainerName = [plan.trainer.firstname, plan.trainer.lastname].filter(Boolean).join(' ') || t('detail.trainer')
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25 }}
-      className="h-full rounded-2xl border border-border bg-background p-4 shadow-soft"
-    >
-      <div className="flex items-center justify-between gap-3">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl bg-gray-50 p-4 transition-shadow hover:shadow-soft-md">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <StatusBadge
-            status={assignment.status}
-            colors={assignmentStatusColors}
-            label={t('common:enums.assignmentStatus.' + assignment.status)}
-          />
-          <h2 className="mt-2 text-base font-semibold text-foreground">
-            {plan.name}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t('common:enums.difficultyLevel.' + plan.difficultyLevel)} · {t('planCard.sessionsPerWeek', { count: plan.sessionsPerWeek })}
-          </p>
+          <StatusBadge status={assignment.status} colors={assignmentStatusColors} label={t(`common:enums.assignmentStatus.${assignment.status}`)} />
+          <h3 className="mt-2 font-semibold text-gray-900">{plan.name}</h3>
+          <p className="mt-1 text-xs text-gray-500">{t(`common:enums.difficultyLevel.${plan.difficultyLevel}`)} · {t('planCard.sessionsPerWeek', { count: plan.sessionsPerWeek })}</p>
         </div>
-        <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-          {t('planCard.weeks', { count: plan.durationWeeks })}
-        </span>
+        <span className="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">{t('planCard.weeks', { count: plan.durationWeeks })}</span>
       </div>
-
-      <ProgressBar value={progress} className="mt-5" />
-      <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-        <span>{t('planCard.complete', { count: Math.round(progress) })}</span>
-        <span>
-          {t('planCard.loggedCount', { completed: assignment.completedWorkouts ?? 0, total: assignment.totalWorkouts ?? 0 })}
-        </span>
+      <ProgressBar value={progress} className="mt-4" />
+      <div className="mt-2 flex justify-between text-xs text-gray-500">
+        <span>{Math.round(progress)}%</span>
+        <span>{assignment.completedWorkouts}/{assignment.totalWorkouts}</span>
       </div>
-
-      <div className="mt-5 flex items-center justify-between gap-3">
-        <div className="inline-flex min-w-0 items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
-          <User2 className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">{trainerName}</span>
-        </div>
+      <div className="mt-4 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-xs text-gray-500"><User2 className="h-3.5 w-3.5" /> <span className="truncate">{trainerName}</span></div>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onStart}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90"
-          >
-            <Play className="h-3.5 w-3.5" />
-            {t('planCard.start')}
+          <button type="button" onClick={onStart} className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700">
+            <Play className="h-3.5 w-3.5" /> {t('planCard.start')}
           </button>
-          <Link
-            to={`/workouts/${assignment.id}`}
-            className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary hover:underline"
-          >
-            {t('planCard.details')}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <Link to={`/workouts/${assignment.id}`} className="text-xs font-semibold text-emerald-600 hover:text-emerald-700">{t('planCard.details')} →</Link>
         </div>
       </div>
     </motion.div>
@@ -412,60 +180,31 @@ const WorkoutCard = ({
 
 const LogRow = ({ log }: { log: WorkoutLogResponse }) => {
   const { t } = useTranslation(['workouts', 'common'])
-
   return (
-    <div className="rounded-2xl border border-border bg-background p-3">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold text-foreground">
-            {log.exercise.name}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {formatDate(log.workoutDate)} · {t('common:enums.exerciseCategory.' + log.exercise.category)}
-          </p>
-        </div>
-        {log.difficultyRating && (
-          <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">
-            {t('planCard.rpe')} {log.difficultyRating}/5
-          </span>
-        )}
+    <div className="flex items-center justify-between rounded-xl bg-gray-50 p-3">
+      <div>
+        <p className="text-sm font-medium text-gray-900">{log.exercise.name}</p>
+        <p className="text-xs text-gray-500">{formatDate(log.workoutDate)} · {t(`common:enums.exerciseCategory.${log.exercise.category}`)}</p>
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">
-        {[
-          log.setsCompleted ? `${log.setsCompleted} ${t('planCard.sets')}` : null,
-          log.repsCompleted ? `${log.repsCompleted} ${t('planCard.reps')}` : null,
-          log.weightUsed ? `${log.weightUsed} ${t('planCard.kg')}` : null,
-        ]
-          .filter(Boolean)
-          .join(' · ') || t('planCard.workoutLogged')}
-      </p>
+      <div className="text-right">
+        {log.difficultyRating && <span className="text-xs text-gray-400">RPE {log.difficultyRating}/5</span>}
+        <p className="text-xs text-gray-500">{[log.setsCompleted ? `${log.setsCompleted}×${log.repsCompleted}` : null, log.weightUsed ? `${log.weightUsed}kg` : null].filter(Boolean).join(' · ')}</p>
+      </div>
     </div>
   )
 }
 
-const HistoryRow = ({
-  assignment,
-}: {
-  assignment: ClientWorkoutPlanResponse
-}) => {
+const HistoryRow = ({ assignment }: { assignment: ClientWorkoutPlanResponse }) => {
   const { t } = useTranslation(['workouts', 'common'])
-
   return (
-    <Link
-      to={`/workouts/${assignment.id}`}
-      className="grid gap-3 bg-card p-4 transition hover:bg-accent md:grid-cols-[minmax(0,1fr),auto,auto]"
-    >
+    <Link to={`/workouts/${assignment.id}`} className="flex items-center justify-between rounded-xl bg-gray-50 p-4 transition hover:bg-emerald-50">
       <div>
-        <p className="font-semibold text-foreground">{assignment.workoutPlan.name}</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {t('planCard.assignedDate', { date: formatDate(assignment.assignedDate) })}
-        </p>
+        <p className="font-semibold text-gray-900">{assignment.workoutPlan.name}</p>
+        <p className="mt-0.5 text-xs text-gray-500">{t('planCard.assignedDate', { date: formatDate(assignment.assignedDate) })}</p>
       </div>
-      <div className="text-sm text-muted-foreground">
-        {t('common:enums.assignmentStatus.' + assignment.status)}
-      </div>
-      <div className="text-sm font-semibold text-primary">
-        {Math.round(assignment.completionPercentage ?? 0)}%
+      <div className="flex items-center gap-3">
+        <span className="text-sm text-gray-500">{t(`common:enums.assignmentStatus.${assignment.status}`)}</span>
+        <span className="text-sm font-bold text-emerald-600">{Math.round(assignment.completionPercentage ?? 0)}%</span>
       </div>
     </Link>
   )

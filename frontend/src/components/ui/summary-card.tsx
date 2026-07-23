@@ -7,10 +7,10 @@ type SummaryCardProps = {
 }
 
 export const SummaryCard = ({ icon: Icon, label, value }: SummaryCardProps) => (
-  <div className="flex items-center gap-3 rounded-xl bg-muted px-4 py-3">
+  <div className="flex items-center gap-3 rounded-xl bg-emerald-50 px-4 py-3">
     {Icon && (
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-        <Icon className="h-4 w-4 text-primary" />
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100">
+        <Icon className="h-4 w-4 text-emerald-600" />
       </div>
     )}
     <div className="min-w-0 flex-1">

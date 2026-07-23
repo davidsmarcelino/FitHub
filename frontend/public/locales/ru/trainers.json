@@ -34,6 +34,13 @@
     "commentPlaceholder": "Поделитесь своим опытом...",
     "submitButton": "Отправить"
   },
+  "reviewSummary": {
+    "title": "Ваши отзывы",
+    "averageRating": "Средняя оценка",
+    "totalReviews": "Всего отзывов",
+    "professionalism": "Профессионализм",
+    "knowledge": "Знания"
+  },
   "errors": {
     "reviewFailed": "Не удалось отправить отзыв."
   }

@@ -34,6 +34,13 @@
     "commentPlaceholder": "Share your experience...",
     "submitButton": "Submit"
   },
+  "reviewSummary": {
+    "title": "Your Reviews",
+    "averageRating": "Average Rating",
+    "totalReviews": "Total Reviews",
+    "professionalism": "Professionalism",
+    "knowledge": "Knowledge"
+  },
   "errors": {
     "reviewFailed": "Failed to submit review."
   }

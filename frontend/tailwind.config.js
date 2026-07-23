@@ -38,13 +38,11 @@ export default {
         '3xl': '1.5rem',
       },
       boxShadow: {
-        'soft': '0 2px 8px rgba(0, 0, 0, 0.04)',
-        'soft-md': '0 4px 16px rgba(0, 0, 0, 0.06)',
-        'soft-lg': '0 8px 24px rgba(0, 0, 0, 0.08)',
-        'soft-glow': '0 0 40px rgba(56,189,248,0.25)',
+        'soft': '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
+        'soft-md': '0 4px 12px rgba(16,185,129,0.06), 0 2px 4px rgba(0,0,0,0.03)',
+        'soft-lg': '0 12px 32px rgba(16,185,129,0.08), 0 4px 8px rgba(0,0,0,0.04)',
       },
     },
   },
   plugins: [],
 }
-

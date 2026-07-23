@@ -37,6 +37,8 @@
   "planCard": {
     "addExercise": "Exercises",
     "assign": "Assign",
+    "reorder": "Reorder",
+    "reorderDescription": "Drag exercises to reorder them within each day",
     "sessionsPerWeek": "{{count}} sessions/week",
     "weeks": "{{count}} weeks",
     "complete": "{{count}}% complete",

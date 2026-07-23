@@ -28,7 +28,7 @@
     "heightValue": "{{height}} см",
     "heightPlaceholder": "Додайте зріст",
     "hydrationTarget": "Щоденна ціль гідратації",
-    "hydrationValue": "{{target}} ml",
+    "hydrationValue": "{{target}} мл",
     "hydrationPlaceholder": "Встановіть свою ціль"
   },
   "editModal": {
@@ -41,7 +41,7 @@
     "birthdate": "Дата народження",
     "height": "Зріст (см)",
     "weight": "Вага (кг)",
-    "waterTarget": "Ціль води (ml)",
+    "waterTarget": "Ціль води (мл)",
     "gender": "Стать",
     "genderLabels": {
       "male": "Чоловік",

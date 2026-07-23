@@ -2,7 +2,7 @@ import { formatEnum } from '../../lib/utils'
 import { membershipStatusColors } from './status-colors'
 
 // eslint-disable-next-line react-refresh/only-export-components
-export { membershipStatusColors, sessionStatusColors, paymentStatusColors, assignmentStatusColors } from './status-colors'
+export { membershipStatusColors, sessionStatusColors, paymentStatusColors, assignmentStatusColors, workoutStatusColors } from './status-colors'
 
 type StatusBadgeProps = {
   status: string

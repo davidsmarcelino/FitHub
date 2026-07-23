@@ -1,4 +1,4 @@
-import { useEffect, useState, type ComponentType, type FormEvent, type SVGProps } from 'react'
+import { useCallback, useEffect, useState, type ComponentType, type FormEvent, type SVGProps } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import {
@@ -77,7 +77,7 @@ const Progress = () => {
   const [isLoading, setIsLoading] = useState(true)
   const mounted = useMountedRef()
 
-  const loadAll = async () => {
+  const loadAll = useCallback(async () => {
     setIsLoading(true)
     try {
       const [historyData, activeGoalsData, completedGoalsData, recordsData, photosData] =
@@ -101,29 +101,22 @@ const Progress = () => {
     } finally {
       if (mounted.current) setIsLoading(false)
     }
-  }
+  }, [mounted, t])
 
   useEffect(() => {
     void loadAll()
-  }, [])
+  }, [loadAll])
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {getTabs(t).find((tab) => tab.key === activeTab)?.label ?? t('tabs.overview')}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            {t('title')}
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            {t('subtitle')}
-          </p>
-        </div>
+      {/* Gradient header */}
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <h1 className="text-2xl font-bold md:text-3xl">{t('title')}</h1>
+        <p className="mt-1 text-emerald-100">{t('subtitle')}</p>
       </div>
 
-      <div className="flex gap-1 overflow-x-auto rounded-xl border border-border bg-muted p-1" role="tablist">
+      {/* Tabs */}
+      <div className="flex gap-1 overflow-x-auto rounded-xl bg-gray-100 p-1" role="tablist">
         {getTabs(t).map((tab) => (
           <button
             key={tab.key}
@@ -131,10 +124,10 @@ const Progress = () => {
             role="tab"
             aria-selected={activeTab === tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`inline-flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition ${
+            className={`inline-flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium transition ${
               activeTab === tab.key
-                ? 'bg-background text-foreground shadow-soft'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-white text-emerald-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             <tab.icon className="h-4 w-4" />
@@ -314,7 +307,7 @@ const MeasurementsTab = ({
         <button
           type="button"
           onClick={() => setIsCreateOpen(true)}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110"
         >
           <Plus className="h-4 w-4" />
           {t('measurements.addButton')}
@@ -390,7 +383,7 @@ const GoalsTab = ({
         <button
           type="button"
           onClick={() => setIsCreateOpen(true)}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110"
         >
           <Plus className="h-4 w-4" />
           {t('goals.newButton')}
@@ -461,7 +454,7 @@ const RecordsTab = ({
         <button
           type="button"
           onClick={() => setIsCreateOpen(true)}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110"
         >
           <Plus className="h-4 w-4" />
           {t('records.addButton')}
@@ -505,7 +498,7 @@ const PhotosTab = ({
         <button
           type="button"
           onClick={() => setIsUploadOpen(true)}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110"
         >
           <Camera className="h-4 w-4" />
           {t('photos.addButton')}
@@ -554,7 +547,7 @@ const TrendTile = ({
   return (
     <div className="rounded-xl bg-muted px-4 py-3">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={`mt-1 text-lg font-bold ${isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
+      <p className={`mt-1 text-lg font-bold ${isPositive ? 'text-emerald-600' : 'text-foreground'}`}>
         {change != null ? `${change > 0 ? '+' : ''}${change.toFixed(1)} ${unit}` : '—'}
       </p>
     </div>
@@ -582,7 +575,7 @@ const MetricCard = ({
         <p className="text-xs font-medium text-muted-foreground">{label}</p>
         <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
         {change != null && unit && (
-          <p className={`mt-1 flex items-center gap-1 text-xs font-medium ${change <= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+          <p className={`mt-1 flex items-center gap-1 text-xs font-medium ${change <= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
             {change <= 0 ? <TrendingDown className="h-3 w-3" /> : <TrendingUp className="h-3 w-3" />}
             {change > 0 ? '+' : ''}{change.toFixed(1)} {unit}
           </p>
@@ -615,7 +608,7 @@ const MeasurementCard = ({ measurement }: { measurement: BodyMeasurementResponse
         </div>
         <div className="flex items-center gap-2">
           {measurement.weightChange != null && (
-            <span className={`rounded-full px-2 py-1 text-xs font-semibold ${measurement.weightChange <= 0 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-red-500/10 text-red-600 dark:text-red-400'}`}>
+            <span className={`rounded-full px-2 py-1 text-xs font-semibold ${measurement.weightChange <= 0 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-red-500/10 text-red-600'}`}>
               {measurement.weightChange > 0 ? '+' : ''}{measurement.weightChange.toFixed(1)} kg
             </span>
           )}
@@ -793,7 +786,7 @@ const RecordRow = ({ record }: { record: PersonalRecordResponse }) => {
           </p>
         </div>
         {record.improvement != null && record.improvement > 0 && (
-          <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+          <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-600">
             +{record.improvement}
           </span>
         )}
@@ -818,7 +811,7 @@ const RecordCard = ({ record }: { record: PersonalRecordResponse }) => {
           </p>
         </div>
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10">
-          <Trophy className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+          <Trophy className="h-4 w-4 text-amber-600" />
         </div>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
@@ -838,7 +831,7 @@ const RecordCard = ({ record }: { record: PersonalRecordResponse }) => {
         )}
       </div>
       {record.improvement != null && record.improvement > 0 && (
-        <p className="mt-3 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+        <p className="mt-3 text-xs font-medium text-emerald-600">
           {t('records.improvedBy', { value: record.improvement, unit: record.unit.toLowerCase() })}
         </p>
       )}

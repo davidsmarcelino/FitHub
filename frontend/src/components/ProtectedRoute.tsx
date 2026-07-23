@@ -16,11 +16,12 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
 
   useEffect(() => {
     if (isAuthenticated && token && !user && roles.length === 0) {
+      void fetchCurrentUser()
       const timeout = setTimeout(() => setLoadError(true), 10_000)
       return () => clearTimeout(timeout)
     }
     setLoadError(false)
-  }, [isAuthenticated, token, user, roles])
+  }, [isAuthenticated, token, user, roles, fetchCurrentUser])
 
   if (!isAuthenticated && !token) {
     return <Navigate to="/login" replace state={{ from: location }} />
@@ -30,12 +31,12 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
     if (loadError) {
       return (
         <div className="flex min-h-[50vh] items-center justify-center">
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card px-6 py-4 text-sm text-foreground shadow-soft-lg">
+          <div className="flex flex-col items-center gap-3 rounded-2xl bg-white px-6 py-4 text-sm text-foreground shadow-soft-lg">
             <p>{t('errors.loadFailed')}</p>
             <button
               type="button"
               onClick={() => { setLoadError(false); void fetchCurrentUser() }}
-              className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+              className="rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-soft transition-all hover:shadow-soft-md"
             >
               {t('buttons.retry')}
             </button>
@@ -45,8 +46,8 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
     }
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground shadow-soft-lg">
-          <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-border border-t-primary" />
+        <div className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sm text-foreground shadow-soft-lg">
+          <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-emerald-200 border-t-emerald-600" />
           {t('buttons.loading')}
         </div>
       </div>

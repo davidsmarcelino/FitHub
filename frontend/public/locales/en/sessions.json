@@ -7,10 +7,6 @@
   "filter": {
     "all": "All"
   },
-  "errors": {
-    "loadFailed": "Unable to load training sessions.",
-    "joinFailed": "Unable to join session."
-  },
   "fallbacks": {
     "trainer": "Trainer"
   },
@@ -18,13 +14,7 @@
     "sessionType": "Session Type",
     "startTime": "Start Time",
     "endTime": "End Time",
-    "capacity": "Max Participants",
-    "validation": {
-      "startTimeRequired": "Start time is required.",
-      "endTimeRequired": "End time is required.",
-      "endTimeAfterStart": "End time must be after start time.",
-      "participantsMin": "At least 1 participant is required."
-    }
+    "capacity": "Max Participants"
   },
   "viewAttendance": "View Attendance",
   "checkInClient": "Check in client",
@@ -32,6 +22,13 @@
   "alreadyJoined": "Already joined",
   "sessionFull": "Join waitlist",
   "waitlisted": "Added to waitlist.",
+  "leaveWaitlist": "Leave waitlist",
+  "leftWaitlist": "Removed from waitlist.",
+  "errors": {
+    "loadFailed": "Unable to load training sessions.",
+    "joinFailed": "Failed to join session.",
+    "leaveWaitlistFailed": "Failed to leave waitlist."
+  },
   "emptyState": {
     "title": "No sessions found",
     "description": "Check back later for new training sessions."

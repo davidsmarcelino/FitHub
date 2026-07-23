@@ -34,6 +34,13 @@
     "commentPlaceholder": "Поділіться своїм досвідом...",
     "submitButton": "Надіслати"
   },
+  "reviewSummary": {
+    "title": "Ваші відгуки",
+    "averageRating": "Середня оцінка",
+    "totalReviews": "Загальна кількість відгуків",
+    "professionalism": "Професіоналізм",
+    "knowledge": "Знання"
+  },
   "errors": {
     "reviewFailed": "Не вдалося надіслати відгук."
   }

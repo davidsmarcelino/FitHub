@@ -83,7 +83,7 @@ const Profile = () => {
     }
 
     void loadProfile()
-  }, [])
+  }, [mounted, t])
 
   const fullName =
     profile && profile.firstname && profile.lastname
@@ -158,27 +158,21 @@ const Profile = () => {
 
   return (
     <div className="relative space-y-6">
-      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('badge')}
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            {fullName}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t('subtitle')}
-          </p>
+      <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 p-6 text-white md:p-8">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <h1 className="text-2xl font-bold md:text-3xl">{fullName}</h1>
+            <p className="mt-1 text-emerald-100">{t('subtitle')}</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleOpenEdit}
+            disabled={isLoading || Boolean(error)}
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-white/20 px-4 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {t('editButton')}
+          </button>
         </div>
-
-        <button
-          type="button"
-          onClick={handleOpenEdit}
-          disabled={isLoading || Boolean(error)}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground transition-all hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {t('editButton')}
-        </button>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr),minmax(0,1fr)]">
@@ -400,7 +394,7 @@ const Profile = () => {
                 <button
                   type="submit"
                   disabled={isSaving || !canSave}
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-xl hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isSaving && (
                     <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />

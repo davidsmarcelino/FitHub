@@ -14,7 +14,7 @@ export const ProgressBar = ({ value, className }: ProgressBarProps) => (
     className={`h-2 overflow-hidden rounded-full bg-muted ${className ?? ''}`}
   >
     <div
-      className="h-full rounded-full bg-primary transition-all duration-500"
+      className="h-full rounded-full bg-gradient-to-r from-primary to-emerald-400 transition-all duration-500"
       style={{ width: `${clampPercentage(value)}%` }}
     />
   </div>
