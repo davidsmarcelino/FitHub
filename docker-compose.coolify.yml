@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fithub_db
+      POSTGRES_USER: fithub
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fithub_test_password}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fithub -d fithub_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-fithub_redis_test}"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"${REDIS_PASSWORD:-fithub_redis_test}\" ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  maildev:
+    image: maildev/maildev:latest
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_URL: jdbc:postgresql://postgres:5432/fithub_db
+      DB_USERNAME: fithub
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-fithub_test_password}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-fithub_redis_test}
+      MAIL_HOST: maildev
+      MAIL_PORT: 1025
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      FRONTEND_URL: ${SERVICE_URL_WEB:-http://localhost}
+      APP_CORS_ALLOWED_ORIGINS: ${SERVICE_URL_WEB:-http://localhost}
+      JWT_ACCESS_TOKEN_EXPIRATION: 86400000
+      JWT_REFRESH_TOKEN_EXPIRATION: 684000000
+    volumes:
+      - uploads-data:/app/uploads
+      - logs-data:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      maildev:
+        condition: service_started
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_API_BASE_URL: /api/v1
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "80"
+
+volumes:
+  postgres-data:
+  redis-data:
+  uploads-data:
+  logs-data:
